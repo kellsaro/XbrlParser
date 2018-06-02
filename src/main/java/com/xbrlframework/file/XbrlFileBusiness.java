@@ -237,7 +237,6 @@ public class XbrlFileBusiness {
 				
 				//Thread limitations on Heroku free account (i.e. < 256)
 				if (threads.size() == 250) {
-					System.out.println("Printing set of 250 facts");
 					Iterator<Thread> tempThreads = threads.iterator();
 					while (tempThreads.hasNext()) {
 						Thread t = tempThreads.next();
