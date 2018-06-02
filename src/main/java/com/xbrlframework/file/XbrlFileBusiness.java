@@ -6,11 +6,14 @@ package com.xbrlframework.file;
 //import java.io.OutputStreamWriter;
 import java.io.IOException;
 import java.io.InputStream;
-import java.util.ArrayList;
-import java.util.Iterator;
-import java.util.List;
+//import java.util.ArrayList;
+//import java.util.Iterator;
+//import java.util.List;
 import java.util.Map;
 import java.util.Optional;
+import java.util.concurrent.ExecutorService;
+import java.util.concurrent.Executors;
+import java.util.concurrent.TimeUnit;
 
 import javax.xml.parsers.DocumentBuilder;
 import javax.xml.parsers.DocumentBuilderFactory;
@@ -223,33 +226,37 @@ public class XbrlFileBusiness {
 			xfile.setFactNumber(instance.getFactList().size());
 			json.append("	\"fact\" : [ \n");
 			
-			Thread printFactThread = null;
-			List<Thread> threads = new ArrayList<>();
+			//Thread printFactThread = null;
+			//List<Thread> threads = new ArrayList<>();
+			ExecutorService executor = Executors.newFixedThreadPool(200);
 			for (Fact fact: instance.getFactList()) {
-				Runnable printFactRun = () -> {
+				Runnable runFactPrint = () -> {
 					synchronized (json) {
 						this.printFact(json, fact, instance);
 					}
 				};
-				printFactThread = new Thread(printFactRun);
-				threads.add(printFactThread);
-				printFactThread.start();
-				
-				//Thread limitations on Heroku free account (i.e. < 256)
-				if (threads.size() == 200) {
-					Iterator<Thread> tempThreads = threads.iterator();
-					while (tempThreads.hasNext()) {
-						Thread t = tempThreads.next();
-						while (t.isAlive()) {
-							//do noting, just waiting to finish...
-						}
-						t.interrupt();
-						tempThreads.remove();
-					}
-					threads = new ArrayList<>();
-				}
+				executor.execute(runFactPrint);
+			}
+			executor.shutdown();
+			// Wait until all threads are finish
+			try {
+				executor.awaitTermination(30, TimeUnit.SECONDS);
+			} catch (InterruptedException e) {
+				e.printStackTrace();
+			}
+			/*
+			 * printFactThread = new Thread(printFactRun); threads.add(printFactThread);
+			 * printFactThread.start();
+			 * 
+			 * //Thread limitations on Heroku free account (i.e. < 256) if (threads.size()
+			 * == 200) { Iterator<Thread> tempThreads = threads.iterator(); while
+			 * (tempThreads.hasNext()) { Thread t = tempThreads.next(); while (t.isAlive())
+			 * { //do noting, just waiting to finish... } t.interrupt();
+			 * tempThreads.remove(); } threads = new ArrayList<>(); }
+			 */
 				
 			}
+			/*
 			if (threads.size() > 0) {
 				for (Thread t: threads) {
 					while (t.isAlive()) {
@@ -259,11 +266,12 @@ public class XbrlFileBusiness {
 					t = null;
 				}
 			}
+			*/
 			
 			json.deleteCharAt(json.toString().trim().length()-1);  //delete last "," of object
 			json.append("	] \n"); //closed fact
 		}
-	}
+	
 	
 	private void printPrefixes(StringBuilder json, Instance instance) {
 		if (instance.getPrefixList() != null) {

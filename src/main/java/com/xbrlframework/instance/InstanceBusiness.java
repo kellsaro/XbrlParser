@@ -2,9 +2,12 @@ package com.xbrlframework.instance;
 
 import java.util.ArrayList;
 import java.util.HashMap;
-import java.util.Iterator;
+//import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
+import java.util.concurrent.ExecutorService;
+import java.util.concurrent.Executors;
+import java.util.concurrent.TimeUnit;
 
 import org.w3c.dom.Document;
 import org.w3c.dom.Element;
@@ -357,13 +360,15 @@ public class InstanceBusiness {
     
     public List<Fact> getFacts(){
     	List<Fact> facts = new ArrayList<>();
-    	Thread thread = null;
+    	//Thread thread = null;
     	NodeList nodes = this.getNodeChildrenFrom(this.getRootNode());
     	
-    	List<Thread> threads = new ArrayList<>();;
+    	//List<Thread> threads = new ArrayList<>();;
+    	ExecutorService executor = null;
 		for (int i = 0; i < nodes.getLength(); i++) {
 			Node node = nodes.item(i);
-			Runnable factThread = () -> {
+			executor = Executors.newFixedThreadPool(180);
+			Runnable runFactThread = () -> {
 				synchronized (this){
 					if (this.isFact(node)) {
 						Fact fact = this.getFact(node);
@@ -371,38 +376,31 @@ public class InstanceBusiness {
 					}
 				}
 			};
-			thread = new Thread(factThread);
-			threads.add(thread);
-			thread.start();
-			
-			//Thread limitations on Heroku free account (i.e. < 256)
-			if (threads.size() == 200) {
-				Iterator<Thread> tempThreads = threads.iterator();
-				while (tempThreads.hasNext()) {
-					Thread t = tempThreads.next();
-					while (t.isAlive()) {
-						//do noting, just waiting to finish...
-					}
-					t.interrupt();
-					tempThreads.remove();
-				}
-				threads = new ArrayList<>();
-			}
-			
+			executor.execute(runFactThread);
 		}
 
-		if (threads.size() > 0) {
-			
-			System.out.println("last "+threads.size());
-			for (Thread t: threads) {
-				while (t.isAlive()) {
-					//do nothing, just waiting...
-				}
-				t.interrupt();
-				t = null;
-			}
+		executor.shutdown();
+		// Wait until all threads are finish
+		try {
+			executor.awaitTermination(10, TimeUnit.SECONDS);
+		} catch (InterruptedException e) {
+			e.printStackTrace();
 		}
-		
+
+		/*
+		 * thread = new Thread(factThread); threads.add(thread); thread.start();
+		 * //Thread limitations on Heroku free account (i.e. < 256) if (threads.size()
+		 * == 200) { Iterator<Thread> tempThreads = threads.iterator(); while
+		 * (tempThreads.hasNext()) { Thread t = tempThreads.next(); while (t.isAlive())
+		 * { //do noting, just waiting to finish... } t.interrupt();
+		 * tempThreads.remove(); } threads = new ArrayList<>(); }
+		 */
+	/*
+	 * if (threads.size() > 0) {
+	 * 
+	 * System.out.println("last "+threads.size()); for (Thread t: threads) { while
+	 * (t.isAlive()) { //do nothing, just waiting... } t.interrupt(); t = null; } }
+	 */
 		return facts;
     }
 
