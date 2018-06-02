@@ -2,6 +2,7 @@ package com.xbrlframework.instance;
 
 import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 
@@ -370,17 +371,36 @@ public class InstanceBusiness {
 					}
 				}
 			};
-			
 			thread = new Thread(factThread);
 			threads.add(thread);
 			thread.start();
+			
+			//Thread limitations on Heroku free account (i.e. < 256)
+			if (threads.size() == 250) {
+				System.out.println("Printing set of 250 facts");
+				Iterator<Thread> tempThreads = threads.iterator();
+				while (tempThreads.hasNext()) {
+					Thread t = tempThreads.next();
+					while (t.isAlive()) {
+						//do noting, just waiting to finish...
+					}
+					tempThreads.remove();
+				}
+				threads = new ArrayList<>();
+			}
+			
 		}
-		
-		for (Thread t: threads) {
-			while (t.isAlive()) {
-				//do noting, just waiting...
+
+		if (threads.size() > 0) {
+			for (Thread t: threads) {
+				while (t.isAlive()) {
+					//do nothing, just waiting...
+				}
+				t.interrupt();
+				t = null;
 			}
 		}
+		
 		return facts;
     }
 

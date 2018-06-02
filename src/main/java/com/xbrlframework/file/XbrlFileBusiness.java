@@ -7,6 +7,7 @@ package com.xbrlframework.file;
 import java.io.IOException;
 import java.io.InputStream;
 import java.util.ArrayList;
+import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
@@ -233,13 +234,30 @@ public class XbrlFileBusiness {
 				printFactThread = new Thread(printFactRun);
 				threads.add(printFactThread);
 				printFactThread.start();
-			}
-			for (Thread t: threads) {
-				while (t.isAlive()) {
-					//do nothing, just waiting...
+				
+				//Thread limitations on Heroku free account (i.e. < 256)
+				if (threads.size() == 250) {
+					System.out.println("Printing set of 250 facts");
+					Iterator<Thread> tempThreads = threads.iterator();
+					while (tempThreads.hasNext()) {
+						Thread t = tempThreads.next();
+						while (t.isAlive()) {
+							//do noting, just waiting to finish...
+						}
+						tempThreads.remove();
+					}
+					threads = new ArrayList<>();
 				}
-				t.interrupt();
-				t = null;
+				
+			}
+			if (threads.size() > 0) {
+				for (Thread t: threads) {
+					while (t.isAlive()) {
+						//do nothing, just waiting...
+					}
+					t.interrupt();
+					t = null;
+				}
 			}
 			
 			json.deleteCharAt(json.toString().trim().length()-1);  //delete last "," of object
