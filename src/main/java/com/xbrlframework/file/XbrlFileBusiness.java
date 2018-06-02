@@ -236,13 +236,14 @@ public class XbrlFileBusiness {
 				printFactThread.start();
 				
 				//Thread limitations on Heroku free account (i.e. < 256)
-				if (threads.size() == 250) {
+				if (threads.size() == 200) {
 					Iterator<Thread> tempThreads = threads.iterator();
 					while (tempThreads.hasNext()) {
 						Thread t = tempThreads.next();
 						while (t.isAlive()) {
 							//do noting, just waiting to finish...
 						}
+						t.interrupt();
 						tempThreads.remove();
 					}
 					threads = new ArrayList<>();
