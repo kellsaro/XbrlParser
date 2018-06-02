@@ -2,6 +2,7 @@ package com.xbrlframework.file;
 
 import java.time.LocalDateTime;
 
+//import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
@@ -13,11 +14,15 @@ import com.xbrlframework.instance.InstanceBusiness;
 
 @RestController
 public class XbrlFileController {
-		
+	
+	//@Autowired
+	//private XbrlFileRepository xf;
+	
 	@ResponseStatus(HttpStatus.OK)
 	@PostMapping(value="/upload")
 	public String loadXbrl(@RequestBody MultipartFile apifile) {
 			System.out.println("xbrlapi: ["+LocalDateTime.now()+"] File name: "+apifile.getOriginalFilename()+", size: "+apifile.getSize());
+			//long tempoInicial = System.currentTimeMillis();
 			String message = "";
 			if ((apifile.getOriginalFilename().contains(".xml") 
 					|| apifile.getOriginalFilename().contains(".xbrl"))) 
@@ -35,6 +40,7 @@ public class XbrlFileController {
 						ib.setRootNodeFrom(xfb.getFileAsDocument());
 						ib.build();
 						String jsonReport = xfb.parseToJson(ib.getInstance());
+						//xf.save(xfb.getXbrlFile());
 						System.out.println("xbrlapi: ["+LocalDateTime.now()+"] Contexts: "+xfb.getXbrlFile().getContextNumber()+", Units: "+xfb.getXbrlFile().getUnitNumber()+","
 								+ "Facts: "+xfb.getXbrlFile().getFactNumber()+", Footnotes: "+xfb.getXbrlFile().getFootnoteNumber()+".");
 						return jsonReport;
@@ -49,6 +55,7 @@ public class XbrlFileController {
 			}
 			System.out.println("file was NOT uploaded successfuly");
 			message += "file was NOT uploaded successfuly\n";
+			//System.out.println("o metodo executou em " + (System.currentTimeMillis() - tempoInicial));
 			return message;
 	}
 	
@@ -67,5 +74,6 @@ public class XbrlFileController {
 			return e.getMessage();
 		}
 	}
+
 	
 }
