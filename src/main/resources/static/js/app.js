@@ -1,7 +1,5 @@
 var app = angular.module("app", ['ngFileUpload']);
 
-
-
 app.controller('xbrlController', ['$scope', 'Upload', '$timeout', function ($scope, Upload, $timeout) {
 
     $scope.uploadFiles = function(file) {
@@ -21,11 +19,11 @@ app.controller('xbrlController', ['$scope', 'Upload', '$timeout', function ($sco
 		            });
 	 	            
 	 	            if (file.size > 10000000){
-	 	            	$scope.f = "Parsing...\n This file has a very big size ("+(file.size)+" bytes), its processing will take several seconds...";
+	 	            	$scope.f = "Parsing...\n This file has a huge size ("+(file.size)+" bytes), its processing will take several (60+) seconds...";
 	 	            }else if (file.size >  5000000){
-	        			$scope.f = "Parsing...\n This size file ("+(file.size)+" bytes) will take few seconds...";
+	        			$scope.f = "Parsing...\n This file has a big size ("+(file.size)+" bytes) will take some seconds ...";
 	        		}else{
-	        			$scope.f = "Parsing...";
+	        			$scope.f = "Parsing...\n The parsing will take few seconds ...";
 	        		}
 	        		
 	        		

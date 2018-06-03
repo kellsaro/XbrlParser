@@ -382,7 +382,7 @@ public class InstanceBusiness {
 		executor.shutdown();
 		// Wait until all threads are finish
 		try {
-			executor.awaitTermination(10, TimeUnit.SECONDS);
+			executor.awaitTermination(30, TimeUnit.SECONDS);
 		} catch (InterruptedException e) {
 			e.printStackTrace();
 		}

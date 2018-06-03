@@ -1,16 +1,16 @@
 package com.xbrlframework.file;
 
-//import java.io.BufferedWriter;
-//import java.io.File;
-//import java.io.FileOutputStream;
-//import java.io.OutputStreamWriter;
+import java.io.BufferedWriter;
+import java.io.File;
+import java.io.FileOutputStream;
+import java.io.OutputStreamWriter;
 import java.io.IOException;
 import java.io.InputStream;
-//import java.util.ArrayList;
-//import java.util.Iterator;
-//import java.util.List;
+import java.util.Collections;
 import java.util.Map;
 import java.util.Optional;
+import java.util.Queue;
+import java.util.concurrent.ConcurrentLinkedQueue;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 import java.util.concurrent.TimeUnit;
@@ -163,75 +163,71 @@ public class XbrlFileBusiness {
 			// -- period					
 			if (context.getPeriod() instanceof PeriodInstant) {
 				PeriodInstant period = (PeriodInstant) context.getPeriod();
-				json.append("				\"xbrl:periodInstant\":\""+period.getInstantPeriodvalue()+"\", \n");
+				json.append("				\"xbrl:periodInstant\":\""+period.getInstantPeriodvalue()+"\"");
 			}else if (context.getPeriod() instanceof PeriodStartEnd) {
 				PeriodStartEnd period = (PeriodStartEnd) context.getPeriod();
 				json.append("				\"xbrl:periodStart\":\""+period.getStartValue()+"\", \n");
-				json.append("				\"xbrl:periodEnd\":\""+period.getEndValue()+"\", \n");
+				json.append("				\"xbrl:periodEnd\":\""+period.getEndValue()+"\"");
 			}else {
 				PeriodForever period = (PeriodForever) context.getPeriod();
-				json.append("				\""+period.getValue()+"\", \n");
+				json.append("				\""+period.getValue()+"\"");
 			}
 		}
-		// -- unit
-		/*
-		Optional<Unit> optUnit = null;
-		try {
-			optUnit = instance.getUnitMap().values().stream()
-				.filter(u -> u.getId().toLowerCase().contains(fact.getUnitRef().toLowerCase()))
-				.findFirst();
-		}catch(Exception e) {
-		}
-		if (optUnit != null && optUnit.isPresent()) {
-			Unit unit = optUnit.get();
-			json.append("				\"xbrl:unit\":\""+unit.getValue()+"\" \n");
-		}
-		*/
+		
+		//unit
 		if (instance.getUnitMap() != null) {
 			xfile.setUnitNumber(instance.getUnitMap().size());
 			Unit unit = instance.getUnitMap().get(fact.getUnitRef());
 			if (unit != null) {
+				json.append(",\n"); // ',' from period, expecting unit
 				json.append("				\"xbrl:unit\":\""+unit.getValue()+"\" \n");
+			}else {
+				json.append("\n"); //not expecting unit
 			}
-			if (json.toString().trim().charAt(json.toString().trim().length()-1) == ',' ) {
-				json.deleteCharAt(json.toString().trim().length()-1);
-			}
+		}else {
+			json.append("\n"); //not expecting unit
 		}
-		json.append("			}, \n"); //closed aspect
 		
+		json.append("			}"); // closed aspect
 		
 		//footnote
-		if (instance.getFootnoteMap() != null && instance.getFootnoteMap().size() > 0) {
+		if (instance.getFootnoteMap() != null) {
 			xfile.setFootnoteNumber(instance.getFootnoteMap().size());
 			Footnote footnote = instance.getFootnoteMap().get("#" + fact.getId());
 			if (footnote != null) {
+				json.append(",\n"); // expecting footnote
 				json.append("			\"footnote\": { \n");
 				json.append("				\"group\":\"" + footnote.getGroup() + "\", \n");
 				json.append("				\"footnoteType\":\"" + footnote.getFootnoteType() + "\", \n");
 				json.append("				\"footnote\":\"" + footnote.getFootnote() + "\", \n");
 				json.append("				\"language\":\"" + footnote.getLanguage() + "\" \n");
 				json.append("			} \n");
+			}else {
+				json.append("\n"); //not expecting footnote
 			}
+		}else {
+			json.append("\n"); // not expecting footnote
 		}
 		
-		if (json.toString().trim().charAt(json.toString().trim().length()-1) == ',' ) {
-			json.deleteCharAt(json.toString().trim().length()-1);
-		}
 		json.append("		}, \n"); //close fact
+		
 		return json;
 	}
+	
 	
 	private void printFacts(StringBuilder json, Instance instance){
 		if (instance.getFactList() != null) {
 			xfile.setFactNumber(instance.getFactList().size());
 			json.append("	\"fact\" : [ \n");
 			
-			//Thread printFactThread = null;
-			//List<Thread> threads = new ArrayList<>();
-			ExecutorService executor = Executors.newFixedThreadPool(200);
-			for (Fact fact: instance.getFactList()) {
+			ExecutorService executor = Executors.newFixedThreadPool(150);
+			Queue<Fact> qfact = new ConcurrentLinkedQueue<>(
+					Collections.unmodifiableList(instance.getFactList())
+					);
+			while (qfact.peek() != null) {
+				Fact fact = qfact.poll();
 				Runnable runFactPrint = () -> {
-					synchronized (json) {
+					synchronized (this) {
 						this.printFact(json, fact, instance);
 					}
 				};
@@ -243,34 +239,11 @@ public class XbrlFileBusiness {
 				executor.awaitTermination(30, TimeUnit.SECONDS);
 			} catch (InterruptedException e) {
 				e.printStackTrace();
-			}
-			/*
-			 * printFactThread = new Thread(printFactRun); threads.add(printFactThread);
-			 * printFactThread.start();
-			 * 
-			 * //Thread limitations on Heroku free account (i.e. < 256) if (threads.size()
-			 * == 200) { Iterator<Thread> tempThreads = threads.iterator(); while
-			 * (tempThreads.hasNext()) { Thread t = tempThreads.next(); while (t.isAlive())
-			 * { //do noting, just waiting to finish... } t.interrupt();
-			 * tempThreads.remove(); } threads = new ArrayList<>(); }
-			 */
-				
-			}
-			/*
-			if (threads.size() > 0) {
-				for (Thread t: threads) {
-					while (t.isAlive()) {
-						//do nothing, just waiting...
-					}
-					t.interrupt();
-					t = null;
-				}
-			}
-			*/
-			
-			json.deleteCharAt(json.toString().trim().length()-1);  //delete last "," of object
+			}		
+			json.deleteCharAt(json.toString().trim().length() - 1); //delete last "," from fact "}," .
 			json.append("	] \n"); //closed fact
 		}
+	}
 	
 	
 	private void printPrefixes(StringBuilder json, Instance instance) {
@@ -329,15 +302,14 @@ public class XbrlFileBusiness {
 		json.append(" } \n"); //end of report
 		json.append("} \n"); //root
 
-		/*
 		final String data = json.toString();
 		Runnable saveData = () -> { this.setFileWithJson(data); };
 		new Thread(saveData).start();
-		 */
+		
 		return json.toString().trim();
 	}
 	
-	/*
+	
 	private void setFileWithJson(String json) {
 		try {
 			File file = new File("d:\\", "xbrlFile.json");
@@ -355,7 +327,7 @@ public class XbrlFileBusiness {
 			e.printStackTrace();
 		}
 	}
-	*/
+	
 	
 	public XbrlFile getXbrlFile() {
 		return this.xfile;
