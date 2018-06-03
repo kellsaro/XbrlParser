@@ -364,10 +364,9 @@ public class InstanceBusiness {
     	NodeList nodes = this.getNodeChildrenFrom(this.getRootNode());
     	
     	//List<Thread> threads = new ArrayList<>();;
-    	ExecutorService executor = null;
+    	ExecutorService executor = Executors.newFixedThreadPool(50);
 		for (int i = 0; i < nodes.getLength(); i++) {
 			Node node = nodes.item(i);
-			executor = Executors.newFixedThreadPool(20);
 			Runnable runFactThread = () -> {
 				synchronized (this){
 					if (this.isFact(node)) {
@@ -378,15 +377,18 @@ public class InstanceBusiness {
 			};
 			executor.execute(runFactThread);
 		}
-
-		executor.shutdown();
-		// Wait until all threads are finish
-		try {
-			executor.awaitTermination(30, TimeUnit.SECONDS);
-		} catch (InterruptedException e) {
-			e.printStackTrace();
+		if (!executor.isTerminated()){
+			try {
+				int t = 5;
+				if (instance.getContextMap().size() > 600) {
+					t = 10;
+				}
+				executor.awaitTermination(t, TimeUnit.SECONDS);
+			} catch (InterruptedException e) {
+				e.printStackTrace();
+			}
 		}
-
+		executor.shutdown();
 		/*
 		 * thread = new Thread(factThread); threads.add(thread); thread.start();
 		 * //Thread limitations on Heroku free account (i.e. < 256) if (threads.size()

@@ -1,9 +1,11 @@
 package com.xbrlframework.file;
 
+/*
 import java.io.BufferedWriter;
 import java.io.File;
 import java.io.FileOutputStream;
 import java.io.OutputStreamWriter;
+*/
 import java.io.IOException;
 import java.io.InputStream;
 import java.util.Collections;
@@ -220,7 +222,7 @@ public class XbrlFileBusiness {
 			xfile.setFactNumber(instance.getFactList().size());
 			json.append("	\"fact\" : [ \n");
 			
-			ExecutorService executor = Executors.newFixedThreadPool(20);
+			ExecutorService executor = Executors.newFixedThreadPool(50);
 			Queue<Fact> qfact = new ConcurrentLinkedQueue<>(
 					Collections.unmodifiableList(instance.getFactList())
 					);
@@ -233,13 +235,27 @@ public class XbrlFileBusiness {
 				};
 				executor.execute(runFactPrint);
 			}
+
+			if (!executor.isTerminated()){
+				try {
+					
+					int t = 0;
+					if (xfile.getSize() <= 1_000_000) {
+						t = 1;
+					}else if (xfile.getSize() > 1_000_000 && xfile.getSize() <= 3_000_000 ) {
+						t = 3;
+					}else if (xfile.getSize() > 3_000_000 && xfile.getSize() <= 6_000_000 ) {
+						t = 6;
+					}else {
+						t = 10;
+					}
+					executor.awaitTermination(t, TimeUnit.SECONDS);
+				} catch (InterruptedException e) {
+					e.printStackTrace();
+				}
+			}
 			executor.shutdown();
-			// Wait until all threads are finish
-			try {
-				executor.awaitTermination(30, TimeUnit.SECONDS);
-			} catch (InterruptedException e) {
-				e.printStackTrace();
-			}		
+	
 			json.deleteCharAt(json.toString().trim().length() - 1); //delete last "," from fact "}," .
 			json.append("	] \n"); //closed fact
 		}
@@ -302,14 +318,15 @@ public class XbrlFileBusiness {
 		json.append(" } \n"); //end of report
 		json.append("} \n"); //root
 
+		/*
 		final String data = json.toString();
 		Runnable saveData = () -> { this.setFileWithJson(data); };
 		new Thread(saveData).start();
-		
+		*/
 		return json.toString().trim();
 	}
 	
-	
+	/*
 	private void setFileWithJson(String json) {
 		try {
 			File file = new File("d:\\", "xbrlFile.json");
@@ -327,7 +344,7 @@ public class XbrlFileBusiness {
 			e.printStackTrace();
 		}
 	}
-	
+	*/
 	
 	public XbrlFile getXbrlFile() {
 		return this.xfile;
