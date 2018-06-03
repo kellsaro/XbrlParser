@@ -367,7 +367,7 @@ public class InstanceBusiness {
     	ExecutorService executor = null;
 		for (int i = 0; i < nodes.getLength(); i++) {
 			Node node = nodes.item(i);
-			executor = Executors.newFixedThreadPool(180);
+			executor = Executors.newFixedThreadPool(50);
 			Runnable runFactThread = () -> {
 				synchronized (this){
 					if (this.isFact(node)) {
