@@ -5,16 +5,17 @@ app.controller('xbrlController', ['$scope', 'Upload', '$timeout', function ($sco
     $scope.uploadFiles = function(file) {
         
     	$scope.f = file;
+    	
     	if (file != null){
     		
     		$scope.name = file.name;
-    		   	
+    		
 	        if (file.name.includes(".xml") || file.name.includes(".xbrl") ) {
 	        	if (file.size <= 15000000) {
 	        		
 	 	            file.upload = Upload.upload({
-		                url: 'https://xbrlframework.herokuapp.com/upload',
-		                //url: 'http://localhost:8080/upload',
+		                //url: 'https://xbrlframework.herokuapp.com/upload',
+		                url: 'http://localhost:8080/upload',
 		                data: {apifile: file}
 		            });
 	 	            
@@ -30,11 +31,10 @@ app.controller('xbrlController', ['$scope', 'Upload', '$timeout', function ($sco
 		
 		            file.upload.then(
 		            	function success (response) {
+		            		console.log(response.data);
 		            		$scope.f = JSON.stringify(response.data, undefined, 4);
-		            		$timeout(function () {
-		            			console.log(response.data);
-		            			console.log(response.status);
-		            		});
+		            		$timeout(function () {console.log(response.status);});
+		            		
 		            	}, 
 		            	function unsuccess (response) {
 		            		console.log("response is a error: "+response.data);

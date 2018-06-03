@@ -5,9 +5,11 @@ import java.util.HashMap;
 //import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
+import java.util.concurrent.Callable;
+import java.util.concurrent.ExecutionException;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
-import java.util.concurrent.TimeUnit;
+import java.util.concurrent.Future;
 
 import org.w3c.dom.Document;
 import org.w3c.dom.Element;
@@ -363,46 +365,41 @@ public class InstanceBusiness {
     	//Thread thread = null;
     	NodeList nodes = this.getNodeChildrenFrom(this.getRootNode());
     	
-    	//List<Thread> threads = new ArrayList<>();;
     	ExecutorService executor = Executors.newFixedThreadPool(50);
-		for (int i = 0; i < nodes.getLength(); i++) {
+    	List<Callable<Boolean>> callables = new ArrayList<>();
+
+    	for (int i = 0; i < nodes.getLength(); i++) {
 			Node node = nodes.item(i);
-			Runnable runFactThread = () -> {
+			Callable<Boolean> task = () -> {
 				synchronized (this){
 					if (this.isFact(node)) {
 						Fact fact = this.getFact(node);
 						facts.add(fact);
 					}
+					return true;
 				}
 			};
-			executor.execute(runFactThread);
+			executor.submit(task);
+			callables.add(task);
 		}
-		if (!executor.isTerminated()){
-			try {
-				int t = 5;
-				if (instance.getContextMap().size() > 600) {
-					t = 10;
+
+		try {
+			List<Future<Boolean>> futures = executor.invokeAll(callables);
+			for (Future<Boolean> f: futures) {
+				if (!f.isDone()) {
+					try {
+						f.get();
+					} catch (ExecutionException e) {
+						e.printStackTrace();
+					}
 				}
-				executor.awaitTermination(t, TimeUnit.SECONDS);
-			} catch (InterruptedException e) {
-				e.printStackTrace();
 			}
+		} catch (InterruptedException e) {
+			e.printStackTrace();
 		}
+		
 		executor.shutdown();
-		/*
-		 * thread = new Thread(factThread); threads.add(thread); thread.start();
-		 * //Thread limitations on Heroku free account (i.e. < 256) if (threads.size()
-		 * == 200) { Iterator<Thread> tempThreads = threads.iterator(); while
-		 * (tempThreads.hasNext()) { Thread t = tempThreads.next(); while (t.isAlive())
-		 * { //do noting, just waiting to finish... } t.interrupt();
-		 * tempThreads.remove(); } threads = new ArrayList<>(); }
-		 */
-	/*
-	 * if (threads.size() > 0) {
-	 * 
-	 * System.out.println("last "+threads.size()); for (Thread t: threads) { while
-	 * (t.isAlive()) { //do nothing, just waiting... } t.interrupt(); t = null; } }
-	 */
+		
 		return facts;
     }
 

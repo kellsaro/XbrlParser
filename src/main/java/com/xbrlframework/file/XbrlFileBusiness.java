@@ -8,14 +8,18 @@ import java.io.OutputStreamWriter;
 */
 import java.io.IOException;
 import java.io.InputStream;
+import java.util.ArrayList;
 import java.util.Collections;
+import java.util.List;
 import java.util.Map;
 import java.util.Optional;
 import java.util.Queue;
+import java.util.concurrent.Callable;
 import java.util.concurrent.ConcurrentLinkedQueue;
+import java.util.concurrent.ExecutionException;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
-import java.util.concurrent.TimeUnit;
+import java.util.concurrent.Future;
 
 import javax.xml.parsers.DocumentBuilder;
 import javax.xml.parsers.DocumentBuilderFactory;
@@ -222,40 +226,45 @@ public class XbrlFileBusiness {
 			xfile.setFactNumber(instance.getFactList().size());
 			json.append("	\"fact\" : [ \n");
 			
-			ExecutorService executor = Executors.newFixedThreadPool(50);
+	    	ExecutorService executor = Executors.newFixedThreadPool(50);
+	    	List<Callable<Boolean>> callables = new ArrayList<>();
+
 			Queue<Fact> qfact = new ConcurrentLinkedQueue<>(
 					Collections.unmodifiableList(instance.getFactList())
 					);
+			
 			while (qfact.peek() != null) {
 				Fact fact = qfact.poll();
-				Runnable runFactPrint = () -> {
-					synchronized (this) {
+				Callable<Boolean> task = () -> {
+					synchronized (this){
 						this.printFact(json, fact, instance);
 					}
+					return true;
 				};
-				executor.execute(runFactPrint);
+				executor.submit(task);
+				callables.add(task);
 			}
 
-			if (!executor.isTerminated()){
-				try {
-					
-					int t = 0;
-					if (xfile.getSize() <= 1_000_000) {
-						t = 1;
-					}else if (xfile.getSize() > 1_000_000 && xfile.getSize() <= 3_000_000 ) {
-						t = 3;
-					}else if (xfile.getSize() > 3_000_000 && xfile.getSize() <= 6_000_000 ) {
-						t = 6;
-					}else {
-						t = 10;
+			try {
+				List<Future<Boolean>> futures = executor.invokeAll(callables);
+				for (Future<Boolean> f: futures) {
+					try {
+						f.get();
+					} catch (ExecutionException e) {
+						e.printStackTrace();
 					}
-					executor.awaitTermination(t, TimeUnit.SECONDS);
-				} catch (InterruptedException e) {
-					e.printStackTrace();
 				}
+			} catch (InterruptedException e) {
+				e.printStackTrace();
 			}
+			
 			executor.shutdown();
-	
+			try {
+				Thread.sleep(500);
+			} catch (InterruptedException e) {
+				e.printStackTrace();
+			}
+
 			json.deleteCharAt(json.toString().trim().length() - 1); //delete last "," from fact "}," .
 			json.append("	] \n"); //closed fact
 		}
@@ -345,6 +354,7 @@ public class XbrlFileBusiness {
 		}
 	}
 	*/
+	
 	
 	public XbrlFile getXbrlFile() {
 		return this.xfile;
