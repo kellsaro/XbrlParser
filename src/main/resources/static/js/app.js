@@ -19,11 +19,11 @@ app.controller('xbrlController', ['$scope', 'Upload', '$timeout', function ($sco
 		            });
 	 	            
 	 	            if (file.size > 10000000){
-	 	            	$scope.f = "Parsing...\n This file has a huge size ("+(file.size)+" bytes), its processing can take several seconds...";
+	 	            	$scope.f = "Parsing...\n This file has a huge size ("+(file.size)+" bytes), its processing can take several (180 or +) seconds...\n (we are working for improving this app performance)";
 	 	            }else if (file.size >  5000000){
-	        			$scope.f = "Parsing...\n This file has a big size ("+(file.size)+" bytes), its processing can take some seconds ...";
+	        			$scope.f = "Parsing...\n This file has a big size ("+(file.size)+" bytes), its processing can take some (120 or +) seconds ...\n (we are working for improving this app performance)";
 	        		}else{
-	        			$scope.f = "Parsing...\n This parsing can take few seconds ...";
+	        			$scope.f = "Parsing...\n This parsing can take few (15 or +) seconds ...\n (we are working for improving this app performance)";
 	        		}
 	        		
 	        		
