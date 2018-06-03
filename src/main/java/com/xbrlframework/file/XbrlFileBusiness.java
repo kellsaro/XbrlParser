@@ -220,7 +220,7 @@ public class XbrlFileBusiness {
 			xfile.setFactNumber(instance.getFactList().size());
 			json.append("	\"fact\" : [ \n");
 			
-			ExecutorService executor = Executors.newFixedThreadPool(50);
+			ExecutorService executor = Executors.newFixedThreadPool(20);
 			Queue<Fact> qfact = new ConcurrentLinkedQueue<>(
 					Collections.unmodifiableList(instance.getFactList())
 					);
