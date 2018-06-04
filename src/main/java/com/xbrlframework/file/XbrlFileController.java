@@ -1,7 +1,5 @@
 package com.xbrlframework.file;
 
-import java.time.LocalDateTime;
-
 import org.springframework.http.HttpStatus;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
@@ -17,7 +15,8 @@ public class XbrlFileController {
 	@ResponseStatus(HttpStatus.OK)
 	@PostMapping(value="/upload")
 	public String loadXbrl(@RequestBody MultipartFile apifile) {
-			System.out.println("xbrlapi: ["+LocalDateTime.now()+"] File name: "+apifile.getOriginalFilename()+", size: "+apifile.getSize());
+			long milli1 = System.currentTimeMillis();
+			System.out.println("#### xbrlapi ####: [File name: "+apifile.getOriginalFilename()+", size: "+apifile.getSize()+"]");
 			String message = "";
 			if ((apifile.getOriginalFilename().contains(".xml") 
 					|| apifile.getOriginalFilename().contains(".xbrl"))) 
@@ -35,8 +34,10 @@ public class XbrlFileController {
 						ib.setRootNodeFrom(xfb.getFileAsDocument());
 						ib.build();
 						String jsonReport = xfb.parseToJson(ib.getInstance());
-						System.out.println("xbrlapi: ["+LocalDateTime.now()+"] Contexts: "+xfb.getXbrlFile().getContextNumber()+", Units: "+xfb.getXbrlFile().getUnitNumber()+","
-								+ "Facts: "+xfb.getXbrlFile().getFactNumber()+", Footnotes: "+xfb.getXbrlFile().getFootnoteNumber()+".");
+						System.out.println("#### xbrlapi ####: [Contexts: "+xfb.getXbrlFile().getContextNumber()+", Units: "+xfb.getXbrlFile().getUnitNumber()+","
+								+ "Facts: "+xfb.getXbrlFile().getFactNumber()+", Footnotes: "+xfb.getXbrlFile().getFootnoteNumber()+"]");
+						long milli2 = System.currentTimeMillis();
+						System.out.println("#### xbrlapi ####: [performance time: "+(milli2-milli1)+" milliseconds]");
 						return jsonReport;
 					}
 				}else {
@@ -49,6 +50,8 @@ public class XbrlFileController {
 			}
 			System.out.println("file was NOT uploaded successfuly");
 			message += "file was NOT uploaded successfuly\n";
+			long milli2 = System.currentTimeMillis();
+			System.out.println("#### xbrlapi ####: [performance time:"+(milli2-milli1)+" milliseconds]");
 			return message;
 	}
 	

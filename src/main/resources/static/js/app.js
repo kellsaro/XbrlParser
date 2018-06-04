@@ -14,15 +14,15 @@ app.controller('xbrlController', ['$scope', 'Upload', '$timeout', function ($sco
 	        	if (file.size <= 15000000) {
 	        		
 	 	            file.upload = Upload.upload({
-		                url: 'https://xbrlframework.herokuapp.com/upload',
-		                //url: 'http://localhost:8080/upload',
+		                //url: 'https://xbrlframework.herokuapp.com/upload',
+		                url: 'http://localhost:8080/upload',
 		                data: {apifile: file}
 		            });
 	 	            
 	 	            if (file.size > 10000000){
-	 	            	$scope.f = "Parsing...\n This file has a huge size ("+(file.size)+" bytes), its processing can take several (120 or +) seconds...\n\n (we are working for improving this app performance)";
+	 	            	$scope.f = "Parsing...\n This file has a huge size ("+(file.size)+" bytes), its processing can take several (120 or +) seconds...\n\n (we are working for improving performance issues)";
 	 	            }else if (file.size >  5000000){
-	        			$scope.f = "Parsing...\n This file has a big size ("+(file.size)+" bytes), its processing can take some (60 or +) seconds ...\n\n (we are working for improving this app performance)";
+	        			$scope.f = "Parsing...\n This file has a big size ("+(file.size)+" bytes), its processing can take some (60 or +) seconds ...\n\n (we are working for improving performance issues)";
 	        		}else{
 	        			$scope.f = "Parsing...\n This can take few (15 or +) seconds ...\n\n (we are working for improving this app performance)";
 	        		}

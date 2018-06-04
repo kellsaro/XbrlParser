@@ -365,7 +365,7 @@ public class InstanceBusiness {
     	//Thread thread = null;
     	NodeList nodes = this.getNodeChildrenFrom(this.getRootNode());
     	
-    	ExecutorService executor = Executors.newFixedThreadPool(50);
+    	ExecutorService executor = Executors.newFixedThreadPool(5);
     	List<Callable<Boolean>> callables = new ArrayList<>();
 
     	for (int i = 0; i < nodes.getLength(); i++) {
