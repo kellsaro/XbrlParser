@@ -14,8 +14,8 @@ app.controller('xbrlController', ['$scope', 'Upload', '$timeout', function ($sco
 	        	if (file.size <= 15000000) {
 	        		
 	 	            file.upload = Upload.upload({
-		                //url: 'https://xbrlframework.herokuapp.com/upload',
-		                url: 'http://localhost:8080/upload',
+		                url: 'https://xbrlframework.herokuapp.com/upload',
+		                //url: 'http://localhost:8080/upload',
 		                data: {apifile: file}
 		            });
 	 	            
