@@ -48,9 +48,6 @@ public class InstanceBusinessTest {
 		ib.setRootNodeFrom(xfilebusiness.getFileAsDocument());
 	}
 	
-
-
-// testing putDtsList()
 	@Test
 	public void putDtsList_AppleFile() {
 		ib.putDtsList();
@@ -76,14 +73,11 @@ public class InstanceBusinessTest {
 		assertTrue(ib.getInstance().getDtsList().get(0).getName().equals("schema"));
 		assertTrue(ib.getInstance().getDtsList().get(0).getHref().equals("msft-20180331.xsd"));
 	}
-//testing getgetFacts()
-	
-	public void getFacts_AppleFile() {
 
+	public void getFacts_AppleFile() {
 		assertTrue(ib.getFacts().size() > 1000);
 	}
 	
-//testing getUnits() ===============================================
 	@Test
 	public void getUnits_AppleFile() {
 		ib.putUnits();
@@ -121,7 +115,7 @@ public class InstanceBusinessTest {
 		assertEquals("unitNumerator:iso4217:USD/unitDenominator:xbrli:shares",
 				ib.getInstance().getUnitMap().get("usdPerShare").getValue());
 	}
-//testing putContext() ============================================
+
 	@Test
 	public void putContexts_AppleFile() throws Exception {
 		ib.putContexts();
@@ -189,7 +183,6 @@ public class InstanceBusinessTest {
 
 	}
 	
-//testing getSpecificAttributeValue ================================
 	@Test
 	public void getSpecificAttributeValue_ifNotNull() throws SAXException, IOException {
 		assertNull(ib.getSpecificAttributeValue(ib.getSpecificNode(ib.getNodeChildrenFrom(ib.getRootNode()), "ref"), "scheme"));
@@ -197,54 +190,32 @@ public class InstanceBusinessTest {
 	
 	}
 
-// testing xbrl root node ==========================================
 	@Test
 	public void getRootNode_ifThereIsFile() throws SAXException, IOException {
-		//scenery
 		assertNotNull(ib.getRootNode());
 		assertTrue(ib.getRootNode().getNodeName().toLowerCase().contains("xbrl"));
 	}
 	
 	@Test
 	public void getRootNode_ifFileNull() throws SAXException, IOException {
-		//scenery
 		ib.setRootNodeFrom(null);
 		assertNull(ib.getRootNode());
 	}
 	
-
-	
-//testing getPrefix   =============================================
 	@Test
 	public void putPrefixes_AppleFile() throws SAXException, IOException {
 		ib.putPrefixes();
-		//test
 		assertEquals(24.0, ib.getInstance().getPrefixList().size(), 0.01);
 
 	}
 	
 	@Test
 	public void putPrefixes_NullFile() {
-		//scenery
 		ib.setRootNodeFrom(null);
 		ib.putPrefixes();
-		//test
 		assertEquals(0.0, ib.getInstance().getPrefixList().size(), 0.01);
 	}
-	
-//testing getElements =============================================
-	@Test
-	public void getElements() {
 		
-	}
-	
-//testing getFacts   =============================================
-	@Test
-	public void getFacts() {
-		
-	}
-	
-//testing setDtsListInInstance     =============================================
 	@Test
 	public void setDtsList_AppleFile() throws SAXException, IOException {
 		assertTrue(ib.getDtsList(ib.getRootNode()).size() > 0.0);
@@ -256,8 +227,6 @@ public class InstanceBusinessTest {
 		assertNull(ib.getDtsList(ib.getRootNode()));
 	}
 	
-	
-//testing getSpecificNodeList()
 	@Test
 	public void getSpecificNodeList_ifMany() throws SAXException, IOException {
     	assertNotNull(ib.getSpecificNodeList(ib.getRootNode().getChildNodes(), "context"));
@@ -265,7 +234,6 @@ public class InstanceBusinessTest {
     	assertTrue(ib.getSpecificNodeList(ib.getRootNode().getChildNodes(), "context").size() > 0);
 	}
 	
-//testing getSpecificNode()
 	@Test
     public void getSpecificNode_ifFileNotNull() throws SAXException, IOException {
     	assertNotNull(ib.getSpecificNode(ib.getRootNode().getChildNodes(), "context"));
@@ -276,14 +244,11 @@ public class InstanceBusinessTest {
     
 	@Test
     public void getSpecificNode_ifFileNull() {
-
     	assertNull(ib.getSpecificNode(null, "context"));
     	assertNull(ib.getSpecificNode(null, "marcio"));
     	assertNull(ib.getSpecificNode(null, null));
     }
 	
-    
-//testing getRefType() ============================================
     @Test
     public void getRefType_ifSchema() {
     	String ref = "xbrli:schemaRef";

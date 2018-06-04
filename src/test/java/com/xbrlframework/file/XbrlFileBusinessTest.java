@@ -35,10 +35,6 @@ public class XbrlFileBusinessTest {
 		invalidFile = documentBuilder.parse(notXbrlUri);	
 	}
 	
-
-	/*
-	 * testing toJson
-	 */
 	@Test
 	public void toJson_AppleFile() throws SAXException, IOException {
 		InstanceBusiness ib = new InstanceBusiness();
@@ -46,7 +42,6 @@ public class XbrlFileBusinessTest {
 		ib.build();
 		assertNotNull(xfilebusiness.parseToJson(ib.getInstance()));
 	}
-
 	
 	@Test
 	public void toJson_MsftFile() throws SAXException, IOException {
@@ -57,10 +52,6 @@ public class XbrlFileBusinessTest {
 		assertNotNull(xfilebusiness.parseToJson(ib.getInstance()));		
 	}
 	
-	
-	/*
-	 * testing setFileAs(string)
-	 */
 	@Test
 	public void setFileAs_validURI() throws ParserConfigurationException, SAXException, IOException {
 		assertNotNull(xfilebusiness.getFileAsDocument());
@@ -69,32 +60,22 @@ public class XbrlFileBusinessTest {
 	}
 	
 
-	/*
-	 * testing isXbrlDoc()
-	 */
-
 	@Test
 	public void isXbrlDoc_ifTrue() throws SAXException, IOException {
-		// test
 		assertTrue(xfilebusiness
 				.isXbrlDoc(xfilebusiness.getFileAsDocument()));
 	}
 
 	@Test
 	public void isXbrlDoc_ifEmpty() throws ParserConfigurationException {
-		// test
 		assertFalse(xfilebusiness.isXbrlDoc(null));
 	}
 
 	@Test
 	public void isXbrlDoc_ifInvalidXMLDoc() throws ParserConfigurationException, SAXException, IOException {
-		// test
 		assertFalse(xfilebusiness.isXbrlDoc(invalidFile));
 	}
 	
-	/*
-	 * testing setFileAs =============================================
-	 */
 	@Test
 	public void setFileAs_ifXbrlDoc() throws SAXException, IOException {
 		assertNotNull(xfilebusiness.getFileAsDocument());
@@ -106,11 +87,6 @@ public class XbrlFileBusinessTest {
 		tempFileBusiness.setFileAs(notXbrlUri);
 		assertNull(tempFileBusiness.getFileAsDocument());
 	}
-	
-	
-	/*
-	 * testing setMultipartFile()
-	 */
 
 	@Test 
 	public void setFileAs_MultipartFile() {

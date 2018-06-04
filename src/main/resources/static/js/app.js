@@ -14,8 +14,7 @@ app.controller('xbrlController', ['$scope', 'Upload', '$timeout', function ($sco
 	        	if (file.size <= 15000000) {
 	        		
 	 	            file.upload = Upload.upload({
-		                url: 'https://xbrlframework.herokuapp.com/upload',
-		                //url: 'http://localhost:8080/upload',
+		                url: '## here you put your REST resource ##',
 		                data: {apifile: file}
 		            });
 	 	            
@@ -26,10 +25,8 @@ app.controller('xbrlController', ['$scope', 'Upload', '$timeout', function ($sco
 	        		}else{
 	        			$scope.f = "Parsing...\n This can take few (15 or +) seconds ...\n\n (we are working for improving this app performance)";
 	        		}
-	        		
-	        		
-		
-		            file.upload.then(
+
+	 	            file.upload.then(
 		            	function success (response) {
 		            		console.log(response.data);
 		            		$scope.f = JSON.stringify(response.data, undefined, 4);
@@ -55,7 +52,7 @@ app.controller('xbrlController', ['$scope', 'Upload', '$timeout', function ($sco
 	        	}else{
 	        		console.log("For while, max size per file is 15mb.");
 	    			$scope.f = "Sorry! For while, max size per file is 15mb.";        	}
-	        }else{ // if is xml or xbrl file
+	        }else{ // if is not xml or xbrl file
 	        	console.log("file must be in XML or XBRL format");
 	        	$scope.f = "Sorry! This file must be in XML or XBRL format.";
 	        }

@@ -320,6 +320,9 @@ public class InstanceBusiness {
     	return null;
     }
     
+    /**
+     * put all contexts from XBRL-XML file in a Instance object
+     */
     public void putContexts() {
     	Map<String, Context> contextMap = this.getContexts();
     	instance.setContextMap(contextMap);
@@ -360,6 +363,11 @@ public class InstanceBusiness {
     	instance.setUnitMap(this.getUnits());
     }
     
+    /**
+     * get all fact from XBRL-XML file
+     * 
+     * @return List<Fact>
+     */
     public List<Fact> getFacts(){
     	List<Fact> facts = new ArrayList<>();
     	//Thread thread = null;
@@ -403,7 +411,12 @@ public class InstanceBusiness {
 		return facts;
     }
 
-    
+    /**
+     * build a Fact object from facts contained in XBRL-XML file
+     * 
+     * @param node
+     * @return
+     */
     public Fact getFact(Node node) {
 		NamedNodeMap attrs = node.getAttributes();
 
@@ -457,6 +470,10 @@ public class InstanceBusiness {
 		return false;
 	}
 	
+	/**
+	 * put all facts from XBRL-XML file in a Instance object
+	 * 
+	 */
 	public void putFacts() {
 		List<Fact> facts = this.getFacts();
 		instance.setFactList(facts);
@@ -518,6 +535,7 @@ public class InstanceBusiness {
 	}
 	
 	/**
+	 * put all footnotes from XBRL-XML file in a Instance object
 	 * 
 	 */
 	public void putFootnoteLink() {
@@ -529,7 +547,7 @@ public class InstanceBusiness {
 	
 	/**
 	 * <p><b>getFootnoteLink</b></p>
-	 * <p>get the footnoteLink node of current report</p>
+	 * <p>get the footnoteLink node of the current XBRL-XML file</p>
 	 * @return
 	 */
 	private FootnoteLink getFootnoteLink(){
@@ -600,6 +618,9 @@ public class InstanceBusiness {
 		return this.instance;
 	}
 	
+	/**
+	 * build all Instance object from XBRL-XML file
+	 */
 	public void build() {
 		try {
 			this.putPrefixes();

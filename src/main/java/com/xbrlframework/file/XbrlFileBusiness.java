@@ -270,7 +270,12 @@ public class XbrlFileBusiness {
 		}
 	}
 	
-	
+	/**
+	 * print in result string all prefixes from XBRL-XML document
+	 * 
+	 * @param json
+	 * @param instance
+	 */
 	private void printPrefixes(StringBuilder json, Instance instance) {
 		if (instance.getPrefixList() != null) {
 			xfile.setPrefixNumber(instance.getPrefixList().size());
@@ -298,6 +303,12 @@ public class XbrlFileBusiness {
 		}
 	}
 	
+	/**
+	 * print in result string all dts from XBRL-XML document
+	 * 
+	 * @param json
+	 * @param instance
+	 */
 	private void printDtses(StringBuilder json, Instance instance) {
 		if (instance.getDtsList() != null) {
 			xfile.setDtsNumber(instance.getDtsList().size());
@@ -310,6 +321,12 @@ public class XbrlFileBusiness {
 		}
 	}
 	
+	/**
+	 * parse Instance object (previouly loaded from XBRL-XML file) to string
+	 * 
+	 * @param instance
+	 * @return
+	 */
 	public String parseToJson(Instance instance) {
 		// report
 		StringBuilder json = new StringBuilder("{ \n"); //root
@@ -334,16 +351,23 @@ public class XbrlFileBusiness {
 		*/
 		return json.toString().trim();
 	}
+
 	
+	/**
+	 * put the built string into a file in a local dir
+	 * @param json
+	 */
 	/*
 	private void setFileWithJson(String json) {
 		try {
-			File file = new File("d:\\", "xbrlFile.json");
+			String path = "your path here";
+			String filename = "your-file.json";
+			File file = new File(path, filename);
 			if (!file.exists()){
 				file.createNewFile();
 			}
 			
-			FileOutputStream fos = new FileOutputStream("d:/xbrlFile.json");
+			FileOutputStream fos = new FileOutputStream(path+"/"+filename);
 			OutputStreamWriter opw = new OutputStreamWriter(fos, "UTF-8");
 			BufferedWriter bw = new BufferedWriter(opw);
 			bw.write(json);
@@ -352,6 +376,7 @@ public class XbrlFileBusiness {
 		} catch (IOException e) {
 			e.printStackTrace();
 		}
+		
 	}
 	*/
 	
