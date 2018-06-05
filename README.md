@@ -6,7 +6,7 @@ How to convert a XML-based XBRL file to JSON: https://youtu.be/Xr6v4jL535w;
 
 How to convert a URL-based XBRL file to JSON: https://youtu.be/kr9j4f1-GCY; 
 
-To access the app: https://xbrlframework.herokuapp.com;
+To access the web app: https://xbrlframework.herokuapp.com;
 
 More details/issues are discussed on https://marcioalexandre.wordpress.com/projects/xbrl-parser/;
 
