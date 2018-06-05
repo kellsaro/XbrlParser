@@ -10,19 +10,28 @@
 <style>
 
 #xml {
-	float:relative;
+	position:static;
 	width: 150px;
 	height: 80px;
 	background-color: white;
 	float: left;
 }
 
-#json {
+#url{
 	position:relative;
+	width: 600px;
+	height: 80px;
+	background-color: white;
+	float: left;
+}
+
+#json {
+	position:static;
+	padding-top: 100px;
 	width: 800px;
 	height: 500px;
 	background-color: white;
-	float: left;
+	float: none;
 }
 
 #footnote {
@@ -37,14 +46,19 @@
 	<h4 style="font-family:verdana;">XBRL Parser: XML to Json</h4>
   	
   	<div id="xml">
-  	<p style="font-family:verdana;font-size:12px;">Select:</p>
-  	<button type="file" ngf-select="uploadFiles($file)">xBRL-XML Instance</button>
-  	<p style="font-family:verdana;font-size:12px;">{{name}}</p>
+	  	<p style="font-family:verdana;font-size:12px;">Select:</p>
+	  	<button type="file" ngf-select="uploadFiles($file)">xBRL-XML Instance</button>
+	  	<p style="font-family:verdana;font-size:12px;">{{name}}</p>
+  	</div>
+  	
+  	<div id="url">
+	  	<p style="font-family:verdana;font-size:12px;">or URL:</p>
+	  	<input type="text" ng-model='user_url' size="53" ng-click="init()">
+	  	<button ng-click="sendUrl()">ok</button>
   	</div>
 
 	<div id="json" style="font-family:verdana;font-size:12px;">
-		<p> xBRL-JSON Instance:</p>
-		<textarea rows="25" cols="100">{{f}}</textarea>
+		<textarea rows="25" cols="80">{{f}}</textarea>
  	</div>
  	
  	<div id="footnote" >

@@ -380,7 +380,11 @@ public class XbrlFileBusiness {
 	}
 	*/
 	
-	
+	/**
+	 * get the XBRLFile object
+	 * 
+	 * @return XbrlFile
+	 */
 	public XbrlFile getXbrlFile() {
 		return this.xfile;
 	}

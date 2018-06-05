@@ -41,15 +41,14 @@ public class XbrlFileController {
 						return jsonReport;
 					}
 				}else {
-					System.out.println("empty file");
-					message = "This file is empty\n";
+					System.out.println("{\"#### xbrlapi ####: [This file is empty]\"}");
+					message = "{\"#### xbrlapi ####: [This file is empty]\"}";
 				}
 			}else {
-				System.out.println("It must be a XBRL or XML file");
-				message = "It must be a XBRL or XML file\n"; 
+				System.out.println("{\"#### xbrlapi ####: [It must be a XBRL or XML file]\"}");
+				message = "{\"#### xbrlapi ####: [It must be a XBRL or XML file]\"}"; 
 			}
-			System.out.println("file was NOT uploaded successfuly");
-			message += "file was NOT uploaded successfuly\n";
+			System.out.println("{\"#### xbrlapi ####: [file was NOT uploaded successfuly]\"}");
 			long milli2 = System.currentTimeMillis();
 			System.out.println("#### xbrlapi ####: [performance time:"+(milli2-milli1)+" milliseconds]");
 			return message;
@@ -57,15 +56,29 @@ public class XbrlFileController {
 	
 	@PostMapping(value="/upload-uri")
 	public String loadXbrl(@RequestBody String uri) {
+		long milli1 = System.currentTimeMillis();
+		System.out.println("#### xbrlapi ####: [url: "+uri+"]");
 		try {
 			if (uri != null && !uri.trim().isEmpty()) {
-				XbrlFileBusiness xFileBusiness = new XbrlFileBusiness();
-				xFileBusiness.setFileAs(uri);
-				if (xFileBusiness.getFileAsDocument() != null) {
-					return "file was uploaded successfuly";
+				XbrlFileBusiness xfb = new XbrlFileBusiness();
+				try {
+					xfb.setFileAs(uri);
+				} catch (Exception e) {
+					e.printStackTrace();
+				}
+				if (xfb.getFileAsDocument() != null) {
+					InstanceBusiness ib = new InstanceBusiness();
+					ib.setRootNodeFrom(xfb.getFileAsDocument());
+					ib.build();
+					String jsonReport = xfb.parseToJson(ib.getInstance());
+					System.out.println("#### xbrlapi ####: [Contexts: "+xfb.getXbrlFile().getContextNumber()+", Units: "+xfb.getXbrlFile().getUnitNumber()+","
+							+ "Facts: "+xfb.getXbrlFile().getFactNumber()+", Footnotes: "+xfb.getXbrlFile().getFootnoteNumber()+"]");
+					long milli2 = System.currentTimeMillis();
+					System.out.println("#### xbrlapi ####: [performance time: "+(milli2-milli1)+" milliseconds]");
+					return jsonReport;
 				}
 			}
-			return "file was NOT uploaded successfuly";
+			return "{\"#### xbrlapi ####: [file has NOT been processed by server successfuly]\"}";
 		} catch (Exception e) {
 			return e.getMessage();
 		}
