@@ -5,7 +5,7 @@ app.controller('xbrlController', ['$http','$scope', 'Upload', '$timeout', functi
 	$scope.init = function(){
 		$scope.f = '{\n  "xBRL-JSON file version will be printed here" \n}';
 		$scope.host = 'https://xbrlframework.herokuapp.com';
-		$scope.host = 'http://localhost:8080';
+		//$scope.host = 'http://localhost:8080';
 		$scope.user_url = '';
 	}
 	
