@@ -2,9 +2,9 @@
 
 A web app (+ RESTful api as backend) that converts XBRL-based financial documents from XML to Json format.
 
-How to convert a XML-based XBRL file to JSON: https://youtu.be/Xr6v4jL535w;
+How to convert a xBRL-XML report to xBRL-JSON (via file): https://youtu.be/Xr6v4jL535w;
 
-How to convert a URL-based XBRL file to JSON: https://youtu.be/kr9j4f1-GCY; 
+How to convert a xBRL-XML file to xBRL-JSON (via URL): https://youtu.be/kr9j4f1-GCY; 
 
 To access the web app: https://xbrlframework.herokuapp.com;
 
