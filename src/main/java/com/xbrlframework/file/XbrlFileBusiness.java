@@ -361,7 +361,7 @@ public class XbrlFileBusiness {
 	private void setFileWithJson(String json) {
 		try {
 			String path = "your path here";
-			String filename = "your-file.json";
+			String filename = "your-file-name.json";
 			File file = new File(path, filename);
 			if (!file.exists()){
 				file.createNewFile();
