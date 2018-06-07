@@ -149,13 +149,13 @@ public class XbrlFileBusiness {
 	
 	private StringBuilder printFact(StringBuilder json, Fact fact, Instance instance) {
 		
-		json.append("		{ \n"); //open fact
+		json.append("    { \n"); //open fact
 		if (fact.getId() != null && !fact.getId().isEmpty())
-			json.append("			\"id\":\""+fact.getId()+"\", \n");
+			json.append("      \"id\":\""+fact.getId()+"\", \n");
 		if (fact.getValue() != null && !fact.getValue().isEmpty())
-			json.append("			\"value\":\""+fact.getValue()+"\", \n");
-		json.append("			\"aspect\": { \n");
-		json.append("				\"xbrl:concept\":\""+fact.getName()+"\", \n");
+			json.append("      \"value\":\""+fact.getValue()+"\", \n");
+		json.append("      \"aspect\": { \n");
+		json.append("        \"xbrl:concept\":\""+fact.getName()+"\", \n");
 		
 		//context
 		if (instance.getContextMap() != null) {
@@ -165,18 +165,18 @@ public class XbrlFileBusiness {
 			Context context = contextMap.values().stream()
 					.filter(c -> c.getId().toLowerCase().contains(fact.getContextRef().toLowerCase()))
 					.findFirst().get(); 
-			json.append("				\"xbrl:entity\":\""+context.getEntity().getCid()+"\", \n");
+			json.append("        \"xbrl:entity\":\""+context.getEntity().getCid()+"\", \n");
 			// -- period					
 			if (context.getPeriod() instanceof PeriodInstant) {
 				PeriodInstant period = (PeriodInstant) context.getPeriod();
-				json.append("				\"xbrl:periodInstant\":\""+period.getInstantPeriodvalue()+"\"");
+				json.append("        \"xbrl:periodInstant\":\""+period.getInstantPeriodvalue()+"\"");
 			}else if (context.getPeriod() instanceof PeriodStartEnd) {
 				PeriodStartEnd period = (PeriodStartEnd) context.getPeriod();
-				json.append("				\"xbrl:periodStart\":\""+period.getStartValue()+"\", \n");
-				json.append("				\"xbrl:periodEnd\":\""+period.getEndValue()+"\"");
+				json.append("        \"xbrl:periodStart\":\""+period.getStartValue()+"\", \n");
+				json.append("        \"xbrl:periodEnd\":\""+period.getEndValue()+"\"");
 			}else {
 				PeriodForever period = (PeriodForever) context.getPeriod();
-				json.append("				\""+period.getValue()+"\"");
+				json.append("        \""+period.getValue()+"\"");
 			}
 		}
 		
@@ -186,7 +186,7 @@ public class XbrlFileBusiness {
 			Unit unit = instance.getUnitMap().get(fact.getUnitRef());
 			if (unit != null) {
 				json.append(",\n"); // ',' from period, expecting unit
-				json.append("				\"xbrl:unit\":\""+unit.getValue()+"\" \n");
+				json.append("        \"xbrl:unit\":\""+unit.getValue()+"\" \n");
 			}else {
 				json.append("\n"); //not expecting unit
 			}
@@ -194,7 +194,7 @@ public class XbrlFileBusiness {
 			json.append("\n"); //not expecting unit
 		}
 		
-		json.append("			}"); // closed aspect
+		json.append("      }"); // closed aspect
 		
 		//footnote
 		if (instance.getFootnoteMap() != null) {
@@ -202,12 +202,12 @@ public class XbrlFileBusiness {
 			Footnote footnote = instance.getFootnoteMap().get("#" + fact.getId());
 			if (footnote != null) {
 				json.append(",\n"); // expecting footnote
-				json.append("			\"footnote\": { \n");
-				json.append("				\"group\":\"" + footnote.getGroup() + "\", \n");
-				json.append("				\"footnoteType\":\"" + footnote.getFootnoteType() + "\", \n");
-				json.append("				\"footnote\":\"" + footnote.getFootnote() + "\", \n");
-				json.append("				\"language\":\"" + footnote.getLanguage() + "\" \n");
-				json.append("			} \n");
+				json.append("      \"footnote\": { \n");
+				json.append("        \"group\":\"" + footnote.getGroup() + "\", \n");
+				json.append("        \"footnoteType\":\"" + footnote.getFootnoteType() + "\", \n");
+				json.append("        \"footnote\":\"" + footnote.getFootnote() + "\", \n");
+				json.append("        \"language\":\"" + footnote.getLanguage() + "\" \n");
+				json.append("      } \n");
 			}else {
 				json.append("\n"); //not expecting footnote
 			}
@@ -215,7 +215,7 @@ public class XbrlFileBusiness {
 			json.append("\n"); // not expecting footnote
 		}
 		
-		json.append("		}, \n"); //close fact
+		json.append("    }, \n"); //close fact
 		
 		return json;
 	}
@@ -224,7 +224,7 @@ public class XbrlFileBusiness {
 	private void printFacts(StringBuilder json, Instance instance){
 		if (instance.getFactList() != null) {
 			xfile.setFactNumber(instance.getFactList().size());
-			json.append("	\"fact\" : [ \n");
+			json.append("  \"fact\" : [ \n");
 			
 	    	ExecutorService executor = Executors.newFixedThreadPool(5);
 	    	List<Callable<Boolean>> callables = new ArrayList<>();
@@ -266,7 +266,7 @@ public class XbrlFileBusiness {
 			}
 
 			json.deleteCharAt(json.toString().trim().length() - 1); //delete last "," from fact "}," .
-			json.append("	] \n"); //closed fact
+			json.append("  ] \n"); //closed fact
 		}
 	}
 	
@@ -294,12 +294,12 @@ public class XbrlFileBusiness {
 			}
 			
 			instance.getPrefixList().add(new Prefix("xbrl","http://www.xbrl.org/CR/2017-05-02/oim"));
-			json.append("	\"prefix\" : { \n");
+			json.append("  \"prefix\" : { \n");
 			for (Prefix prefix: instance.getPrefixList()) {
-				json.append("		\""+prefix.getName()+"\":\""+prefix.getValue()+"\", \n");
+				json.append("    \""+prefix.getName()+"\":\""+prefix.getValue()+"\", \n");
 			}
 			json.deleteCharAt(json.toString().trim().length()-1);  //delete last "," of object
-			json.append("	}, \n");
+			json.append("  }, \n");
 		}
 	}
 	
@@ -312,12 +312,12 @@ public class XbrlFileBusiness {
 	private void printDtses(StringBuilder json, Instance instance) {
 		if (instance.getDtsList() != null) {
 			xfile.setDtsNumber(instance.getDtsList().size());
-			json.append("	\"dts\" : { \n");
+			json.append("  \"dts\" : { \n");
 			for (Dts dts: instance.getDtsList()) {
-				json.append("		\""+dts.getName()+"\":\""+dts.getHref()+"\", \n");
+				json.append("    \""+dts.getName()+"\":\""+dts.getHref()+"\", \n");
 			}
 			json.deleteCharAt(json.toString().trim().length()-1); //delete last "," of object
-			json.append("	}, \n");
+			json.append("  }, \n");
 		}
 	}
 	
@@ -329,11 +329,11 @@ public class XbrlFileBusiness {
 	 */
 	public String parseToJson(Instance instance) {
 		// report
-		StringBuilder json = new StringBuilder("{ \n"); //root
-		json.append(" \"report\" : { \n"); //start of report
+		StringBuilder json = new StringBuilder("{\n"); //root
+		json.append("  \"report\" : {\n"); //start of report
 		if (instance != null) {
 			try {
-				json.append("	\"documentType\":\""+instance.getDocumentType()+"\", \n");
+				json.append("    \"documentType\":\""+instance.getDocumentType()+"\", \n");
 				printPrefixes(json, instance);
 				printDtses(json, instance);
 				printFacts(json, instance);
@@ -341,7 +341,7 @@ public class XbrlFileBusiness {
 				e.printStackTrace();
 			}
 		}
-		json.append(" } \n"); //end of report
+		json.append("  } \n"); //end of report
 		json.append("} \n"); //root
 
 		/*
@@ -361,7 +361,7 @@ public class XbrlFileBusiness {
 	private void setFileWithJson(String json) {
 		try {
 			String path = "your path here";
-			String filename = "your-file-namexx.json";
+			String filename = "your-file-name.json";
 			File file = new File(path, filename);
 			if (!file.exists()){
 				file.createNewFile();
