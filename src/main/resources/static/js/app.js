@@ -1,7 +1,7 @@
 var app = angular.module("app", ['ngFileUpload']);
 
 app.controller('xbrlController', ['$http','$scope', 'Upload', '$timeout', function ($http, $scope, Upload, $timeout) {
-
+	
 	$scope.init = function(){
 		$scope.host = 'https://xbrlframework.herokuapp.com';
 		//$scope.host = 'http://localhost:8080';
@@ -12,30 +12,34 @@ app.controller('xbrlController', ['$http','$scope', 'Upload', '$timeout', functi
 	
 	$scope.init();	
 	
-    $scope.uploadFiles = function(file) {
+	$scope.buildindString = function(){
+		
+		$scope.docType = '"documentType" : "http://www.xbrl.org/CR/2017-05-02/xbrl-json",\n';
+		$scope.prefixes = '"loading..."\n';
+		$scope.dts = '"loading..."\n';
+		$scope.facts = '"loading..."\n';
+		
+		$scope.f = '{\n' 
+			+'  "report" : {\n'
+			+'    '+$scope.docType
+			+'    "prefix" : {\n'
+			+'      '+$scope.prefixes
+			+'    }\n'
+			+'    "dts": {\n'
+			+'      '+$scope.dts
+			+'    }\n'
+			+'    "fact" : [\n'
+			+'      '+$scope.facts
+			+'    ]\n'
+			+'  }\n'
+		+'}';
+	}
+
+	$scope.uploadFiles = function(file) {
     	
     	if (file != null){
     		
-    		$scope.name = file.name;
-    		$scope.docType = '"documentType" : "http://www.xbrl.org/CR/2017-05-02/xbrl-json",\n';
-    		$scope.prefixes = '"loading..."\n';
-    		$scope.dts = '"loading..."\n';
-    		$scope.facts = '"loading..."\n';
-    		
-    		$scope.f = '{\n' 
-				+'  "report" : {\n'
-				+'    '+$scope.docType
-				+'    "prefix" : {\n'
-				+'      '+$scope.prefixes
-				+'    }\n'
-				+'    "dts": {\n'
-				+'      '+$scope.dts
-				+'    }\n'
-				+'    "fact" : [\n'
-				+'      '+$scope.facts
-				+'    ]\n'
-				+'  }\n'
-			+'}';
+    		$scope.buildingString();
     		
 	        if (file.name.includes(".xml") || file.name.includes(".xbrl") ) {
 	        	if (file.size <= 15000000) {
@@ -88,17 +92,11 @@ app.controller('xbrlController', ['$http','$scope', 'Upload', '$timeout', functi
 	    
     		if ($scope.user_url.includes(".xml") || $scope.user_url.includes(".xbrl")){
     			
-        		$scope.prefixes = '"loading"';
-        		$scope.dts = '"loading"';
-        		$scope.facts = '"loading"';
+    			$scope.buildindString();
     			
     			var temp = $scope.user_url.split("/");
     			$scope.name = temp[temp.length-1];
 	    		
-    			$scope.f = '{\n  "msg": "Parse has already been started...", '+
-	    					'\n  "performance warning": "XBRL file with 3+ MB usually takes some seconds to be processed", '+
-	    					'\n  "so": "We are working on performance issues"\n}';
-		    
 	    		$http({
 					method:'POST', 
 					url: $scope.host+'/upload-uri',
