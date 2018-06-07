@@ -3,10 +3,11 @@ var app = angular.module("app", ['ngFileUpload']);
 app.controller('xbrlController', ['$http','$scope', 'Upload', '$timeout', function ($http, $scope, Upload, $timeout) {
 
 	$scope.init = function(){
-		$scope.f = '{\n  "xBRL-JSON file version will be printed here" \n}';
-		$scope.host = 'https://xbrlframework.herokuapp.com';
-		//$scope.host = 'http://localhost:8080';
+		//$scope.host = 'https://xbrlframework.herokuapp.com';
+		$scope.host = 'http://localhost:8080';
 		$scope.user_url = '';
+		$scope.loadStatus = '	';		
+		$scope.f = '{\n "report" : {\n   "load a XBRL instance file" \n } \n}';
 	}
 	
 	$scope.init();	
@@ -16,37 +17,45 @@ app.controller('xbrlController', ['$http','$scope', 'Upload', '$timeout', functi
     	if (file != null){
     		
     		$scope.name = file.name;
+    		$scope.docType = '"documentType" : "http://www.xbrl.org/CR/2017-05-02/xbrl-json",\n';
+    		$scope.prefixes = '"loading..."\n';
+    		$scope.dts = '"loading..."\n';
+    		$scope.facts = '"loading..."\n';
+    		
+    		$scope.f = '{\n' 
+				+'  "report" : {\n'
+				+'    '+$scope.docType
+				+'    "prefix" : {\n'
+				+'      '+$scope.prefixes
+				+'    }\n'
+				+'    "dts": {\n'
+				+'      '+$scope.dts
+				+'    }\n'
+				+'    "fact" : [\n'
+				+'      '+$scope.facts
+				+'    ]\n'
+				+'  }\n'
+			+'}';
     		
 	        if (file.name.includes(".xml") || file.name.includes(".xbrl") ) {
 	        	if (file.size <= 15000000) {
-	        		
+	        		        		
 	 	            file.upload = Upload.upload({
 		                url: $scope.host+'/upload',
 		                data: {apifile: file}
-		            });
+		            });      
 	 	            
-	 	            if (file.size > 10000000){
-	 	            	$scope.f = '{\n  "msg": "Parse has already been started...", '+
-	 	            			    '\n  "performance warning": "This file has a huge size ('+(file.size)+' bytes), its processing can take several (120 or +) seconds...", '+
-	 	            			    '\n  "so": "We are working on performance issues"\n}';
-	 	            }else if (file.size >  5000000){
-	        			$scope.f = '{\n  "msg": "Parse has already been started...", '+
-         			    			'\n  "performance warning": "This file has a big size ('+(file.size)+' bytes), its processing can take several (120 or +) seconds...", '+
-         			    			'\n  "so": "We are working on performance issues"\n}';
-	        		}else{
-	        			$scope.f = '{\n  "msg": "Parse has already been started..." '+
-			    					'\n}';
-	        		}
-
 	 	            file.upload.then(
 		            	function success (response) {
 		            		console.log(response.data);
 		            		$scope.f = JSON.stringify(response.data, undefined, 4);
 		            		$timeout(function () {console.log(response.status);});
+		            		$scope.loadStatus = '';
 		            	}, 
 		            	function unsuccess (response) {
 		            		console.log("response is a error: "+response.data);
 		            		console.log("response.status: "+response.status);
+		            		$scope.loadStatus = '';
 		            		if (response.status == 500)
 		            			$scope.f = '{\n "msg": "Sorry for this error! Possible reasons"' +
 		            					'\n "[1]": "This api-rest version just parses xBRL-XML INSTANCE file from SEC standard",' +
@@ -69,6 +78,7 @@ app.controller('xbrlController', ['$http','$scope', 'Upload', '$timeout', functi
 	        	$scope.f = '{\n "msg": "Sorry! This file must be in XML or XBRL format" \n}';
 	        }
 	       } // if not null
+    	   
     	}
 
     
@@ -77,6 +87,10 @@ app.controller('xbrlController', ['$http','$scope', 'Upload', '$timeout', functi
     	if ($scope.user_url.includes("http://") || $scope.user_url.includes("https://")){
 	    
     		if ($scope.user_url.includes(".xml") || $scope.user_url.includes(".xbrl")){
+    			
+        		$scope.prefixes = '"loading"';
+        		$scope.dts = '"loading"';
+        		$scope.facts = '"loading"';
     			
     			var temp = $scope.user_url.split("/");
     			$scope.name = temp[temp.length-1];
@@ -93,9 +107,11 @@ app.controller('xbrlController', ['$http','$scope', 'Upload', '$timeout', functi
 				.then(function success(response){
 					$scope.clientes = response.data;
 					$scope.f = JSON.stringify(response.data, undefined, 4);
+					$scope.loadStatus = '';
 				},function unsuccess(response){
 					console.log(response);
 					$scope.f = '{\n "msg": "sorry! there was some error in server" \n}';
+					$scope.loadStatus = '';
 				});
 	    	
     		}else{
@@ -109,6 +125,5 @@ app.controller('xbrlController', ['$http','$scope', 'Upload', '$timeout', functi
     					'\n  "example": "https://www.sec.gov/Archives/edgar/data/1169567/000116956714000019/oxfo-20140930.xml" \n}';
     	}
     }
-    
-
+        
 }]);

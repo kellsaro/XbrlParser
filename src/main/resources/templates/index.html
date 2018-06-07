@@ -27,7 +27,7 @@
 
 #json {
 	position:static;
-	padding-top: 100px;
+	padding-top: 110px;
 	width: 800px;
 	height: 500px;
 	background-color: white;
@@ -43,7 +43,9 @@
 </head>
 <body ng-controller="xbrlController">
 	
+	<header>
 	<h4 style="font-family:verdana;">XBRL Parser: XML to Json</h4>
+  	</header>
   	
   	<div id="xml">
 	  	<p style="font-family:verdana;font-size:12px;">Select:</p>
@@ -61,11 +63,11 @@
 		<textarea rows="23" cols="80">{{f}}</textarea>
  	</div>
  	
- 	<div id="footnote" >
+ 	<footer>
  	<p style="font-family:verdana;font-size:10px;">This XBRL-Parser version is based on <a href="http://www.xbrl.org/Specification/xbrl-json/CR-2017-05-02/xbrl-json-CR-2017-05-02.html" target="_blank">xBRL-JSON specification</a> (CR-02 May 2017).</p>
  	<p style="font-family:verdana;font-size:10px;">Attention: "Simple fact" order (in Json file) is not necessarily maintained as saved in XML file. In order to find it, search by its Id or Concept attrs.</p>
  	<p style="font-family:verdana;font-size:10px;">Developed by <a href="https://www.linkedin.com/in/marcioalexandre83/" target="_blank">Marcio Alexandre</a> from <a href="https://xbrlframework.wordpress.com/" target="_blank">XBRLFramework Group.</p>
- 	</div>
+ 	</footer>
  	
  	
 </body>
