@@ -3,8 +3,7 @@ var app = angular.module("app", ['ngFileUpload']);
 app.controller('xbrlController', ['$http','$scope', 'Upload', '$timeout', function ($http, $scope, Upload, $timeout) {
 	
 	$scope.init = function(){
-		$scope.host = 'https://xbrlframework.herokuapp.com';
-		//$scope.host = 'http://localhost:8080';
+		$scope.host = 'your url here';
 		$scope.user_url = '';
 		$scope.loadStatus = '	';		
 		$scope.f = '{\n "report" : {\n   "load a XBRL instance file" \n } \n}';
@@ -45,7 +44,7 @@ app.controller('xbrlController', ['$http','$scope', 'Upload', '$timeout', functi
 	        	if (file.size <= 15000000) {
 	        		        		
 	 	            file.upload = Upload.upload({
-		                url: $scope.host+'/upload',
+		                url: $scope.host+'/your path here',
 		                data: {apifile: file}
 		            });      
 	 	            
@@ -99,7 +98,7 @@ app.controller('xbrlController', ['$http','$scope', 'Upload', '$timeout', functi
 	    		
 	    		$http({
 					method:'POST', 
-					url: $scope.host+'/upload-uri',
+					url: $scope.host+'/your path here',
 					data: $scope.user_url
 				})
 				.then(function success(response){
