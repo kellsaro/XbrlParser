@@ -3,8 +3,8 @@ var app = angular.module("app", ['ngFileUpload']);
 app.controller('xbrlController', ['$http','$scope', 'Upload', '$timeout', function ($http, $scope, Upload, $timeout) {
 
 	$scope.init = function(){
-		//$scope.host = 'https://xbrlframework.herokuapp.com';
-		$scope.host = 'http://localhost:8080';
+		$scope.host = 'https://xbrlframework.herokuapp.com';
+		//$scope.host = 'http://localhost:8080';
 		$scope.user_url = '';
 		$scope.loadStatus = '	';		
 		$scope.f = '{\n "report" : {\n   "load a XBRL instance file" \n } \n}';
