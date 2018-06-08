@@ -3,7 +3,7 @@ var app = angular.module("app", ['ngFileUpload']);
 app.controller('xbrlController', ['$http','$scope', 'Upload', '$timeout', function ($http, $scope, Upload, $timeout) {
 	
 	$scope.init = function(){
-		$scope.host = 'your url here';
+		$scope.host = 'http://localhost:8080' || 'https://xbrlframework.herokuapp.com';
 		$scope.user_url = '';
 		$scope.loadStatus = '	';		
 		$scope.f = '{\n "report" : {\n   "load a XBRL instance file" \n } \n}';
@@ -11,7 +11,7 @@ app.controller('xbrlController', ['$http','$scope', 'Upload', '$timeout', functi
 	
 	$scope.init();	
 	
-	$scope.buildindString = function(){
+	$scope.initString = function(){
 		
 		$scope.docType = '"documentType" : "http://www.xbrl.org/CR/2017-05-02/xbrl-json",\n';
 		$scope.prefixes = '"loading..."\n';
@@ -38,20 +38,27 @@ app.controller('xbrlController', ['$http','$scope', 'Upload', '$timeout', functi
     	
     	if (file != null){
     		
-    		$scope.buildingString();
-    		
+    		$scope.initString();
+    		    		   		
 	        if (file.name.includes(".xml") || file.name.includes(".xbrl") ) {
 	        	if (file.size <= 15000000) {
+	        		
+	        		var prefixe = file;
+	        		var dts = file;
+	        		var facts = file;
+	        		file = null;
+
 	        		        		
-	 	            file.upload = Upload.upload({
-		                url: $scope.host+'/your path here',
+	        		//prefixes
+	        		prefixe.upload = Upload.upload({
+		                url: $scope.host+'/prefixes-file',
 		                data: {apifile: file}
 		            });      
 	 	            
-	 	            file.upload.then(
+	        		prefixe.upload.then(
 		            	function success (response) {
 		            		console.log(response.data);
-		            		$scope.f = JSON.stringify(response.data, undefined, 4);
+		            		$scope.prefixes = JSON.stringify(response.data, undefined, 4);
 		            		$timeout(function () {console.log(response.status);});
 		            		$scope.loadStatus = '';
 		            	}, 
@@ -67,11 +74,64 @@ app.controller('xbrlController', ['$http','$scope', 'Upload', '$timeout', functi
 		            					'\n "[4]":  "This XBRL-XML file is malformed:", '+
 		            					'\n "[4.1]": "The XML prolog is mandatory in file (e.g. <?xml version="1.0" encoding="UTF-8"?>)", '+
 		            					'\n "[4.2]": "The entity \"nbsp\" can have been referenced into XBRL-XML file, but not declared. if so, you must declare it into file (e.g. <!DOCTYPE inline_dtd[<!ENTITY nbsp "&#160;">]>)" \n}' ;
-		            		},
-		            	function (evt) {
-		            		file.progress = Math.min(100, parseInt(100.0 * 
-		                                         evt.loaded / evt.total));
-		            });
+		            		});
+	 	           
+	 	           //dts
+	        		dts.upload = Upload.upload({
+		                url: $scope.host+'/dts-file',
+		                data: {apifile: file}
+		            });      
+	 	            
+	        		dts.upload.then(
+		            	function success (response) {
+		            		console.log(response.data);
+		            		$scope.dts = JSON.stringify(response.data, undefined, 4);
+		            		$timeout(function () {console.log(response.status);});
+		            		$scope.loadStatus = '';
+		            	}, 
+		            	function unsuccess (response) {
+		            		console.log("response is a error: "+response.data);
+		            		console.log("response.status: "+response.status);
+		            		$scope.loadStatus = '';
+		            		if (response.status == 500)
+		            			$scope.f = '{\n "msg": "Sorry for this error! Possible reasons"' +
+		            					'\n "[1]": "This api-rest version just parses xBRL-XML INSTANCE file from SEC standard",' +
+		            					'\n "[2]": "There is some invalid json character into XBRL-XML document (please! send us this file, to find it out)", '+
+		            					'\n "[3]":  "Json-based response string was malformed by tool (please! inform us)", '+
+		            					'\n "[4]":  "This XBRL-XML file is malformed:", '+
+		            					'\n "[4.1]": "The XML prolog is mandatory in file (e.g. <?xml version="1.0" encoding="UTF-8"?>)", '+
+		            					'\n "[4.2]": "The entity \"nbsp\" can have been referenced into XBRL-XML file, but not declared. if so, you must declare it into file (e.g. <!DOCTYPE inline_dtd[<!ENTITY nbsp "&#160;">]>)" \n}' ;
+		            		});
+	 	           
+	 	           
+	 	           //facts
+	        		facts.upload = Upload.upload({
+		                url: $scope.host+'/facts-file',
+		                data: {apifile: file}
+		            });      
+	 	            
+	        		facts.upload.then(
+		            	function success (response) {
+		            		console.log(response.data);
+		            		$scope.facts = JSON.stringify(response.data, undefined, 4);
+		            		$timeout(function () {console.log(response.status);});
+		            		$scope.loadStatus = '';
+		            	}, 
+		            	function unsuccess (response) {
+		            		console.log("response is a error: "+response.data);
+		            		console.log("response.status: "+response.status);
+		            		$scope.loadStatus = '';
+		            		if (response.status == 500)
+		            			$scope.f = '{\n "msg": "Sorry for this error! Possible reasons"' +
+		            					'\n "[1]": "This api-rest version just parses xBRL-XML INSTANCE file from SEC standard",' +
+		            					'\n "[2]": "There is some invalid json character into XBRL-XML document (please! send us this file, to find it out)", '+
+		            					'\n "[3]":  "Json-based response string was malformed by tool (please! inform us)", '+
+		            					'\n "[4]":  "This XBRL-XML file is malformed:", '+
+		            					'\n "[4.1]": "The XML prolog is mandatory in file (e.g. <?xml version="1.0" encoding="UTF-8"?>)", '+
+		            					'\n "[4.2]": "The entity \"nbsp\" can have been referenced into XBRL-XML file, but not declared. if so, you must declare it into file (e.g. <!DOCTYPE inline_dtd[<!ENTITY nbsp "&#160;">]>)" \n}' ;
+		            		});
+	 	           
+	 	           
 	        	}else{
 	        		console.log("For while, max size per file is 15mb.");
 	    			$scope.f = '{\n  "msg": "Sorry! For while, max size per file is 15mb" \n}';
@@ -91,14 +151,14 @@ app.controller('xbrlController', ['$http','$scope', 'Upload', '$timeout', functi
 	    
     		if ($scope.user_url.includes(".xml") || $scope.user_url.includes(".xbrl")){
     			
-    			$scope.buildindString();
+    			$scope.initString();
     			
     			var temp = $scope.user_url.split("/");
     			$scope.name = temp[temp.length-1];
 	    		
 	    		$http({
 					method:'POST', 
-					url: $scope.host+'/your path here',
+					url: $scope.host+'/upload-uri',
 					data: $scope.user_url
 				})
 				.then(function success(response){

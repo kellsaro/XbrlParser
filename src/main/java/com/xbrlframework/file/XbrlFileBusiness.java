@@ -5,21 +5,25 @@ import java.io.BufferedWriter;
 import java.io.File;
 import java.io.FileOutputStream;
 import java.io.OutputStreamWriter;
-*/
-import java.io.IOException;
-import java.io.InputStream;
 import java.util.ArrayList;
-import java.util.Collections;
 import java.util.List;
-import java.util.Map;
-import java.util.Optional;
-import java.util.Queue;
 import java.util.concurrent.Callable;
-import java.util.concurrent.ConcurrentLinkedQueue;
 import java.util.concurrent.ExecutionException;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 import java.util.concurrent.Future;
+*/
+
+import java.io.IOException;
+import java.io.InputStream;
+
+import java.util.Collections;
+
+import java.util.Map;
+import java.util.Optional;
+import java.util.Queue;
+
+import java.util.concurrent.ConcurrentLinkedQueue;
 
 import javax.xml.parsers.DocumentBuilder;
 import javax.xml.parsers.DocumentBuilderFactory;
@@ -215,16 +219,17 @@ public class XbrlFileBusiness {
 			json.append("\n"); // not expecting footnote
 		}
 		
-		json.append("    }, \n"); //close fact
+		json.append("    },\n"); //close fact
 		
 		return json;
 	}
 	
-	
+	/*
 	private void printFacts(StringBuilder json, Instance instance){
 		if (instance.getFactList() != null) {
 			xfile.setFactNumber(instance.getFactList().size());
-			json.append("  \"fact\" : [ \n");
+			
+			json.append("	\"fact\": [\n");
 			
 	    	ExecutorService executor = Executors.newFixedThreadPool(5);
 	    	List<Callable<Boolean>> callables = new ArrayList<>();
@@ -264,11 +269,12 @@ public class XbrlFileBusiness {
 			} catch (InterruptedException e) {
 				e.printStackTrace();
 			}
-
-			json.deleteCharAt(json.toString().trim().length() - 1); //delete last "," from fact "}," .
-			json.append("  ] \n"); //closed fact
+			
+			json.deleteCharAt(json.toString().trim().length()-1);  //delete last "," of object
+			json.append("]\n");
 		}
 	}
+	*/
 	
 	/**
 	 * print in result string all prefixes from XBRL-XML document
@@ -276,6 +282,7 @@ public class XbrlFileBusiness {
 	 * @param json
 	 * @param instance
 	 */
+	/*
 	private void printPrefixes(StringBuilder json, Instance instance) {
 		if (instance.getPrefixList() != null) {
 			xfile.setPrefixNumber(instance.getPrefixList().size());
@@ -302,6 +309,7 @@ public class XbrlFileBusiness {
 			json.append("  }, \n");
 		}
 	}
+	*/
 	
 	/**
 	 * print in result string all dts from XBRL-XML document
@@ -309,6 +317,7 @@ public class XbrlFileBusiness {
 	 * @param json
 	 * @param instance
 	 */
+	/*
 	private void printDtses(StringBuilder json, Instance instance) {
 		if (instance.getDtsList() != null) {
 			xfile.setDtsNumber(instance.getDtsList().size());
@@ -320,6 +329,7 @@ public class XbrlFileBusiness {
 			json.append("  }, \n");
 		}
 	}
+	*/
 	
 	/**
 	 * parse Instance object (previouly loaded from XBRL-XML file) to string
@@ -327,6 +337,7 @@ public class XbrlFileBusiness {
 	 * @param instance
 	 * @return
 	 */
+	/*
 	public String parseToJson(Instance instance) {
 		// report
 		StringBuilder json = new StringBuilder("{\n"); //root
@@ -344,12 +355,109 @@ public class XbrlFileBusiness {
 		json.append("  } \n"); //end of report
 		json.append("} \n"); //root
 
-		/*
+		
 		final String data = json.toString();
 		Runnable saveData = () -> { this.setFileWithJson(data); };
 		new Thread(saveData).start();
-		*/
+		
 		return json.toString().trim();
+	}
+	*/
+	
+	/**
+	 * get all prefixes in json format
+	 * 
+	 * @param instance
+	 * @return
+	 */
+	public String getJustPrefixes(Instance instance) {
+		StringBuilder json = null;
+		if (instance.getPrefixList() != null) {
+			json = new StringBuilder();
+			xfile.setPrefixNumber(instance.getPrefixList().size());
+			Optional<Prefix> optXbrliPrefix = instance.getPrefixList().stream()
+					.filter(p -> p.getName().equals("xbrli"))
+					.findFirst();
+			if (!optXbrliPrefix.isPresent()) {
+				instance.getPrefixList().add(new Prefix("xbrli", "http://www.xbrl.org/2003/instance"));
+			}
+			
+			Optional<Prefix> optXbrlPrefix = instance.getPrefixList().stream()
+					.filter(p -> p.getName().equals("xbrl"))
+					.findFirst();
+			if (optXbrlPrefix.isPresent()) {
+				instance.getPrefixList().remove(optXbrlPrefix.get());
+			}
+			
+			instance.getPrefixList().add(new Prefix("xbrl","http://www.xbrl.org/CR/2017-05-02/oim"));
+			json.append("  \"prefix\" : { \n");
+			for (Prefix prefix: instance.getPrefixList()) {
+				json.append("    \""+prefix.getName()+"\":\""+prefix.getValue()+"\", \n");
+			}
+			json.deleteCharAt(json.toString().trim().length()-1);  //delete last "," of object
+			json.append("  }, \n");
+		}
+		if (json != null && json.length() != 0) {
+			return json.toString().trim();
+		}
+		return null;
+	}
+	
+	/**
+	 * get the dts data
+	 * 
+	 * @param instance
+	 * @return
+	 */
+	public String getJustDts(Instance instance) {
+		StringBuilder json = null;
+		if (instance != null && instance.getDtsList() != null) {
+			xfile.setDtsNumber(instance.getDtsList().size());
+			json = new StringBuilder();
+			json.append("  \"dts\" : { \n");
+			for (Dts dts: instance.getDtsList()) {
+				json.append("    \""+dts.getName()+"\":\""+dts.getHref()+"\", \n");
+			}
+			json.deleteCharAt(json.toString().trim().length()-1); //delete last "," of object
+			json.append("  }, \n");
+		}
+		if (json != null && json.length() != 0) {
+			return json.toString().trim();
+		}
+		return null;
+	}
+	
+	/**
+	 * get the facts data
+	 * 
+	 * @param instance
+	 * @return
+	 */
+	public String getJustFacts(Instance instance) {
+		StringBuilder json = null;
+		if (instance.getFactList() != null) {
+			
+			json = new StringBuilder();
+			xfile.setFactNumber(instance.getFactList().size());
+			//json.append("	\"fact\": [\n");
+
+			Queue<Fact> qfact = new ConcurrentLinkedQueue<>(
+					Collections.unmodifiableList(instance.getFactList())
+					);
+			
+			while (qfact.peek() != null) {
+				Fact fact = qfact.poll();
+				this.printFact(json, fact, instance);
+			}			
+			json.deleteCharAt(json.toString().trim().length()-1);  //delete last "," of object
+			//json.append("]\n");
+		}
+		
+		if (json != null && json.length() != 0) {
+			return json.toString();
+		}
+
+		return null;
 	}
 
 	
@@ -360,7 +468,7 @@ public class XbrlFileBusiness {
 	/*
 	private void setFileWithJson(String json) {
 		try {
-			String path = "your path here";
+			String path = "d://";
 			String filename = "your-file-name.json";
 			File file = new File(path, filename);
 			if (!file.exists()){
