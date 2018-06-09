@@ -1,4 +1,6 @@
-
+/*
+ * created by Marcio Alexandre
+ */
 package com.xbrlframework.file;
 
 import java.time.LocalDateTime;

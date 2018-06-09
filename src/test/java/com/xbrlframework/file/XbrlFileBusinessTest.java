@@ -1,3 +1,7 @@
+/*
+ * created by Marcio Alexandre
+ */
+ 
 package com.xbrlframework.file;
 
 import static org.junit.Assert.assertFalse;
@@ -18,6 +22,7 @@ import org.xml.sax.SAXException;
 
 import com.xbrlframework.file.XbrlFileBusiness;
 import com.xbrlframework.instance.InstanceBusiness;
+import org.json.*;
 
 public class XbrlFileBusinessTest {
 
@@ -36,20 +41,47 @@ public class XbrlFileBusinessTest {
 	}
 	
 	@Test
-	public void toJson_AppleFile() throws SAXException, IOException {
+	public void buildJsonString() throws ParserConfigurationException, SAXException, IOException {
+		xfilebusiness = new XbrlFileBusiness();
+		//String xbrlUri = "https://www.sec.gov/Archives/edgar/data/1169567/000116956714000019/oxfo-20140930.xml";
+		xfilebusiness.setFileAs(xbrlUri);
+		
 		InstanceBusiness ib = new InstanceBusiness();
-		ib.setRootNodeFrom(documentBuilder.parse(xbrlUri));
+		ib.setRootNodeFrom(xfilebusiness.getFileAsDocument());
 		ib.build();
-		assertNotNull(xfilebusiness.parseToJson(ib.getInstance()));
+		String docType = "\"documentType\" : \"http://www.xbrl.org/CR/2017-05-02/xbrl-json\",\n";
+		String prefixes = xfilebusiness.getJustPrefixes(ib.getInstance());
+		String dts = xfilebusiness.getJustDts(ib.getInstance());
+		String facts = xfilebusiness.getJustFacts(ib.getInstance());
+		String f = "{\n" 
+				+"  \"report\" : {\n"
+				+"    "+docType
+				+"    \"prefix\" : "+prefixes
+				+",\n    \"dts\": "+dts
+				+",\n    \"fact\" : "+facts
+				+"  }\n"
+				+"}";
+		
+		xfilebusiness.saveStringInFile(f);
+		
+		assertTrue(this.isJSONValid(prefixes));
+		assertTrue(this.isJSONValid(dts));
+		assertTrue(this.isJSONValid(facts));
+		assertTrue(this.isJSONValid(f));
+		
 	}
 	
-	@Test
-	public void toJson_MsftFile() throws SAXException, IOException {
-		final String xbrlUri = "https://sec.gov/Archives/edgar/data/789019/000156459018009307/msft-20180331.xml";
-		InstanceBusiness ib = new InstanceBusiness();
-		ib.setRootNodeFrom(documentBuilder.parse(xbrlUri));
-		ib.build();
-		assertNotNull(xfilebusiness.parseToJson(ib.getInstance()));		
+	private boolean isJSONValid(String test) {
+	    try {
+	        new JSONObject(test);
+	    } catch (JSONException ex) {
+	        try {
+	            new JSONArray(test);
+	        } catch (JSONException ex1) {
+	            return false;
+	        }
+	    }
+	    return true;
 	}
 	
 	@Test

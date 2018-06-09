@@ -1,10 +1,15 @@
+/*
+ * created by Marcio Alexandre
+ */
+ 
 package com.xbrlframework.file;
 
-/*
+
 import java.io.BufferedWriter;
 import java.io.File;
 import java.io.FileOutputStream;
 import java.io.OutputStreamWriter;
+/*
 import java.util.ArrayList;
 import java.util.List;
 import java.util.concurrent.Callable;
@@ -29,6 +34,9 @@ import javax.xml.parsers.DocumentBuilder;
 import javax.xml.parsers.DocumentBuilderFactory;
 import javax.xml.parsers.ParserConfigurationException;
 
+import org.json.JSONArray;
+import org.json.JSONException;
+import org.json.JSONObject;
 import org.springframework.web.multipart.MultipartFile;
 
 import org.w3c.dom.Document;
@@ -166,21 +174,25 @@ public class XbrlFileBusiness {
 			xfile.setContextNumber(instance.getContextMap().size());
 			// -- entity
 			Map<String,Context> contextMap = instance.getContextMap();
-			Context context = contextMap.values().stream()
+			Optional<Context> optContext = contextMap.values().stream()
 					.filter(c -> c.getId().toLowerCase().contains(fact.getContextRef().toLowerCase()))
-					.findFirst().get(); 
-			json.append("        \"xbrl:entity\":\""+context.getEntity().getCid()+"\", \n");
-			// -- period					
-			if (context.getPeriod() instanceof PeriodInstant) {
-				PeriodInstant period = (PeriodInstant) context.getPeriod();
-				json.append("        \"xbrl:periodInstant\":\""+period.getInstantPeriodvalue()+"\"");
-			}else if (context.getPeriod() instanceof PeriodStartEnd) {
-				PeriodStartEnd period = (PeriodStartEnd) context.getPeriod();
-				json.append("        \"xbrl:periodStart\":\""+period.getStartValue()+"\", \n");
-				json.append("        \"xbrl:periodEnd\":\""+period.getEndValue()+"\"");
-			}else {
-				PeriodForever period = (PeriodForever) context.getPeriod();
-				json.append("        \""+period.getValue()+"\"");
+					.findFirst();
+			if (optContext.isPresent()) {
+				Context context = optContext.get(); 
+			
+				json.append("        \"xbrl:entity\":\""+context.getEntity().getCid()+"\", \n");
+				// -- period					
+				if (context.getPeriod() instanceof PeriodInstant) {
+					PeriodInstant period = (PeriodInstant) context.getPeriod();
+					json.append("        \"xbrl:periodInstant\":\""+period.getInstantPeriodvalue()+"\"");
+				}else if (context.getPeriod() instanceof PeriodStartEnd) {
+					PeriodStartEnd period = (PeriodStartEnd) context.getPeriod();
+					json.append("        \"xbrl:periodStart\":\""+period.getStartValue()+"\", \n");
+					json.append("        \"xbrl:periodEnd\":\""+period.getEndValue()+"\"");
+				}else {
+					PeriodForever period = (PeriodForever) context.getPeriod();
+					json.append("        \""+period.getValue()+"\"");
+				}
 			}
 		}
 		
@@ -212,15 +224,9 @@ public class XbrlFileBusiness {
 				json.append("        \"footnote\":\"" + footnote.getFootnote() + "\", \n");
 				json.append("        \"language\":\"" + footnote.getLanguage() + "\" \n");
 				json.append("      } \n");
-			}else {
-				json.append("\n"); //not expecting footnote
 			}
-		}else {
-			json.append("\n"); // not expecting footnote
 		}
-		
-		json.append("    },\n"); //close fact
-		
+		json.append("\n    }"); //close fact
 		return json;
 	}
 	
@@ -357,7 +363,7 @@ public class XbrlFileBusiness {
 
 		
 		final String data = json.toString();
-		Runnable saveData = () -> { this.setFileWithJson(data); };
+		Runnable saveData = () -> { this.saveStringInFile(data); };
 		new Thread(saveData).start();
 		
 		return json.toString().trim();
@@ -371,9 +377,9 @@ public class XbrlFileBusiness {
 	 * @return
 	 */
 	public String getJustPrefixes(Instance instance) {
-		StringBuilder json = null;
+		StringBuilder json = new StringBuilder("{\n");
 		if (instance.getPrefixList() != null) {
-			json = new StringBuilder();
+			
 			xfile.setPrefixNumber(instance.getPrefixList().size());
 			Optional<Prefix> optXbrliPrefix = instance.getPrefixList().stream()
 					.filter(p -> p.getName().equals("xbrli"))
@@ -390,15 +396,20 @@ public class XbrlFileBusiness {
 			}
 			
 			instance.getPrefixList().add(new Prefix("xbrl","http://www.xbrl.org/CR/2017-05-02/oim"));
-			json.append("  \"prefix\" : { \n");
+			//json.append("  \"prefix\" : { \n");
+			String comma = "";
 			for (Prefix prefix: instance.getPrefixList()) {
-				json.append("    \""+prefix.getName()+"\":\""+prefix.getValue()+"\", \n");
+				json.append(comma);
+				comma = ", \n";
+				json.append("      \""+prefix.getName()+"\":\""+prefix.getValue()+"\"");
+				
 			}
-			json.deleteCharAt(json.toString().trim().length()-1);  //delete last "," of object
-			json.append("  }, \n");
 		}
 		if (json != null && json.length() != 0) {
-			return json.toString().trim();
+			json.append("\n    }\n");
+			if (json != null && isJSONValid(json.toString())) {
+				return json.toString();
+			}
 		}
 		return null;
 	}
@@ -410,19 +421,21 @@ public class XbrlFileBusiness {
 	 * @return
 	 */
 	public String getJustDts(Instance instance) {
-		StringBuilder json = null;
+		StringBuilder json = new StringBuilder("{\n");
 		if (instance != null && instance.getDtsList() != null) {
 			xfile.setDtsNumber(instance.getDtsList().size());
-			json = new StringBuilder();
-			json.append("  \"dts\" : { \n");
+			String comma = "";
 			for (Dts dts: instance.getDtsList()) {
-				json.append("    \""+dts.getName()+"\":\""+dts.getHref()+"\", \n");
+				json.append(comma);
+				comma = ", \n";
+				json.append("    \""+dts.getName()+"\":\""+dts.getHref()+"\"");
 			}
-			json.deleteCharAt(json.toString().trim().length()-1); //delete last "," of object
-			json.append("  }, \n");
 		}
 		if (json != null && json.length() != 0) {
-			return json.toString().trim();
+			json.append("\n    }\n");
+			if (isJSONValid(json.toString())) {
+				return json.toString();
+			}
 		}
 		return null;
 	}
@@ -434,27 +447,30 @@ public class XbrlFileBusiness {
 	 * @return
 	 */
 	public String getJustFacts(Instance instance) {
-		StringBuilder json = null;
+		StringBuilder json = new StringBuilder(" [\n")  ;
 		if (instance.getFactList() != null) {
 			
-			json = new StringBuilder();
 			xfile.setFactNumber(instance.getFactList().size());
 			//json.append("	\"fact\": [\n");
 
 			Queue<Fact> qfact = new ConcurrentLinkedQueue<>(
 					Collections.unmodifiableList(instance.getFactList())
 					);
-			
+			String comma = "";
 			while (qfact.peek() != null) {
 				Fact fact = qfact.poll();
+				json.append(comma);
+				comma = ",\n";
 				this.printFact(json, fact, instance);
 			}			
-			json.deleteCharAt(json.toString().trim().length()-1);  //delete last "," of object
-			//json.append("]\n");
 		}
 		
 		if (json != null && json.length() != 0) {
-			return json.toString();
+			json.append("\n  ]\n");
+			
+			if (json != null && isJSONValid(json.toString())) {
+				return json.toString();
+			}
 		}
 
 		return null;
@@ -465,8 +481,7 @@ public class XbrlFileBusiness {
 	 * put the built string into a file in a local dir
 	 * @param json
 	 */
-	/*
-	private void setFileWithJson(String json) {
+	public void saveStringInFile(String json) {
 		try {
 			String path = "d://";
 			String filename = "your-file-name.json";
@@ -486,7 +501,7 @@ public class XbrlFileBusiness {
 		}
 		
 	}
-	*/
+	
 	
 	/**
 	 * get the XBRLFile object
@@ -495,6 +510,32 @@ public class XbrlFileBusiness {
 	 */
 	public XbrlFile getXbrlFile() {
 		return this.xfile;
+	}
+	
+	/**
+	 * check if the string has a valid json format
+	 * 
+	 * @param test
+	 * @return
+	 */
+	private boolean isJSONValid(String test) {
+		if (test != null) {
+		    try {
+		    	System.out.print("is json valid?");
+		        new JSONObject(test);
+		        System.out.println("[object] yes!");
+		    } catch (JSONException ex) {
+		        try {
+		            new JSONArray(test);
+		            System.out.println("[array] yes!");
+		        } catch (JSONException ex1) {
+		        	ex1.printStackTrace();
+		            return false;
+		        }
+		    }
+		    return true;
+		}
+		return false;
 	}
 	
 }
