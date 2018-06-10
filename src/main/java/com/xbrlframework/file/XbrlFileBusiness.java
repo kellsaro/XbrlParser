@@ -4,12 +4,12 @@
  
 package com.xbrlframework.file;
 
-
+/*
 import java.io.BufferedWriter;
 import java.io.File;
 import java.io.FileOutputStream;
 import java.io.OutputStreamWriter;
-
+*/
 import java.util.ArrayList;
 import java.util.List;
 import java.util.concurrent.Callable;
@@ -363,11 +363,11 @@ public class XbrlFileBusiness {
 		json.append("  } \n"); //end of report
 		json.append("} \n"); //root
 
-		
+		/*
 		final String data = json.toString();
 		Runnable saveData = () -> { this.saveStringInFile(data); };
 		new Thread(saveData).start();
-		
+		*/
 		return json.toString().trim();
 	}
 
@@ -376,6 +376,7 @@ public class XbrlFileBusiness {
 	 * put the built string into a file in a local dir
 	 * @param json
 	 */
+	/*
 	public void saveStringInFile(String json) {
 		try {
 			String path = "d://";
@@ -396,7 +397,7 @@ public class XbrlFileBusiness {
 		}
 		
 	}
-	
+	*/
 	
 	/**
 	 * get the XBRLFile object

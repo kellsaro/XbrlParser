@@ -62,7 +62,7 @@ public class XbrlFileBusinessTest {
 				+"  }\n"
 				+"}";
 		
-		xfilebusiness.saveStringInFile(f);
+		//xfilebusiness.saveStringInFile(f);
 		
 		assertTrue(this.isJSONValid(prefixes));
 		assertTrue(this.isJSONValid(dts));
