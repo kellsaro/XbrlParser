@@ -4,12 +4,12 @@
  
 package com.xbrlframework.file;
 
-/*
+
 import java.io.BufferedWriter;
 import java.io.File;
 import java.io.FileOutputStream;
 import java.io.OutputStreamWriter;
-
+/*
 import java.util.ArrayList;
 import java.util.List;
 import java.util.concurrent.Callable;
@@ -237,7 +237,7 @@ public class XbrlFileBusiness {
 				json.append("      } \n");
 			}
 		}
-		json.append("\n    },\n"); //close fact
+		json.append("\n    }\n"); //close fact
 		return json;
 	}
 	
