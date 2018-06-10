@@ -9,7 +9,7 @@ import java.io.BufferedWriter;
 import java.io.File;
 import java.io.FileOutputStream;
 import java.io.OutputStreamWriter;
-*/
+
 import java.util.ArrayList;
 import java.util.List;
 import java.util.concurrent.Callable;
@@ -17,7 +17,7 @@ import java.util.concurrent.ExecutionException;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 import java.util.concurrent.Future;
-
+*/
 
 import java.io.IOException;
 import java.io.InputStream;
@@ -237,7 +237,7 @@ public class XbrlFileBusiness {
 				json.append("      } \n");
 			}
 		}
-		json.append("\n    },\n"); //close fact
+		json.append("\n    }\n"); //close fact
 		return json;
 	}
 	
@@ -253,25 +253,28 @@ public class XbrlFileBusiness {
 			
 			json.append("	\"fact\": [\n");
 			
-	    	ExecutorService executor = Executors.newFixedThreadPool(2);
-	    	List<Callable<Boolean>> callables = new ArrayList<>();
+	    	//ExecutorService executor = Executors.newFixedThreadPool(2);
+	    	//List<Callable<Boolean>> callables = new ArrayList<>();
 
 			Queue<Fact> qfact = new ConcurrentLinkedQueue<>(
 					Collections.unmodifiableList(instance.getFactList())
 					);
-			
+			String comma = "";
 			while (qfact.peek() != null) {
 				Fact fact = qfact.poll();
-				Callable<Boolean> task = () -> {
-					synchronized (this){
+				//Callable<Boolean> task = () -> {
+					//synchronized (this){
+						json.append(comma);
+						comma = ",";
 						this.printFact(json, fact, instance);
-					}
-					return true;
-				};
-				executor.submit(task);
-				callables.add(task);
+					//}
+					//return true;
+				//};
+				//executor.submit(task);
+				//callables.add(task);
 			}
 
+			/*
 			try {
 				List<Future<Boolean>> futures = executor.invokeAll(callables);
 				for (Future<Boolean> f: futures) {
@@ -291,8 +294,7 @@ public class XbrlFileBusiness {
 			} catch (InterruptedException e) {
 				e.printStackTrace();
 			}
-			
-			json.deleteCharAt(json.toString().trim().length()-1);  //delete last "," of object
+			*/
 			json.append("]\n");
 		}
 	}
