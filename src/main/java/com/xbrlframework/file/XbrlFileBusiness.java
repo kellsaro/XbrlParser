@@ -151,7 +151,11 @@ public class XbrlFileBusiness {
 		}
 	}
 	
-	
+	/**
+	 * get file as an org.w3c.Document object
+	 * 
+	 * @return
+	 */
 	public Document getFileAsDocument() {
 		if (xfile != null) {
 			return xfile.getDocumentFile();
@@ -159,6 +163,14 @@ public class XbrlFileBusiness {
 		return null;
 	}
 	
+	/**
+	 * "write" in a string a fact in json format
+	 * 
+	 * @param json
+	 * @param fact
+	 * @param instance
+	 * @return
+	 */
 	private StringBuilder printFact(StringBuilder json, Fact fact, Instance instance) {
 		json.append("    { \n"); //open fact
 		if (fact.getId() != null && !fact.getId().isEmpty())
@@ -340,7 +352,7 @@ public class XbrlFileBusiness {
 	
 	
 	/**
-	 * parse Instance object (previouly loaded from XBRL-XML file) to string
+	 * parse Instance object (previously loaded from XBRL-XML file) to string
 	 * 
 	 * @param instance
 	 * @return
@@ -373,7 +385,8 @@ public class XbrlFileBusiness {
 
 	
 	/**
-	 * put the built string into a file in a local dir
+	 * put the built json string into a file in a local dir (Test reasons)
+	 * 
 	 * @param json
 	 */
 	/*
@@ -541,6 +554,13 @@ public class XbrlFileBusiness {
 		return null;
 	}	
 	
+	/**
+	 * Preload part of processing, just for giving to user some information about loading
+	 * in this case, just need to know how many facts are in report
+	 * 
+	 * @param json
+	 * @param instance
+	 */
 	public void printPreloadFacts(StringBuilder json, Instance instance) {
 		if (instance.getFactList() != null) {
 			xfile.setFactNumber(instance.getFactList().size());
@@ -549,7 +569,12 @@ public class XbrlFileBusiness {
 			json.append("  ]\n");
 		}
 	}
-	
+	/**
+	 * Preload part of processing, just for giving to user some information about loading
+	 * 
+	 * @param instance
+	 * @return
+	 */
 	public String getPreload(Instance instance) {
 		// report
 		StringBuilder json = new StringBuilder("{\n"); // root

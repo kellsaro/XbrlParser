@@ -14,19 +14,13 @@ import com.xbrlframework.instance.InstanceBusiness;
 
 @RestController
 public class XbrlFileController {
-	
-	/*
-	@Bean
-	public WebMvcConfigurer corsConfigurer() {
-	  return new WebMvcConfigurerAdapter() {
-	    @Override
-	    public void addCorsMappings(CorsRegistry registry) {
-	  registry.addMapping("/**").allowedOrigins("http://localhost:8080");
-	        }
-	      };
-	}
-	*/
-	
+
+	/**
+	 * load a XBRL instance by a given MultipartFile object
+	 * 
+	 * @param file
+	 * @return
+	 */
 	@PostMapping(value="/upload-file")
 	public String loadXbrl(@RequestBody MultipartFile file) {
 			long milli1 = System.currentTimeMillis();
@@ -68,6 +62,12 @@ public class XbrlFileController {
 			return message;
 	}
 		
+	/**
+	 * load a XBRL instance by a given URI
+	 *  
+	 * @param uri
+	 * @return
+	 */
 	@PostMapping(value="/upload-uri")
 	public String loadXbrl(@RequestBody String uri) {
 		long milli1 = System.currentTimeMillis();
@@ -98,6 +98,12 @@ public class XbrlFileController {
 		}
 	}
 	
+	/**
+	 * pre-load a XBRL instance by a given MultipartFile object
+	 * 
+	 * @param file
+	 * @return
+	 */
 	@PostMapping(value="/preload-file")
 	public String getPreLoad(@RequestBody MultipartFile file) {
 		System.out.println("preload-file");
@@ -147,7 +153,12 @@ public class XbrlFileController {
 	}
 	
 	
-	
+	/**
+	 * pre-load a XBRL instance by a given URI
+	 * 
+	 * @param uri
+	 * @return
+	 */
 	@PostMapping(value="/preload-uri")
 	public String getPreLoad(@RequestBody String uri) {
 		long milli1 = System.currentTimeMillis();
