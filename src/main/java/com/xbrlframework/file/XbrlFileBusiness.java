@@ -9,7 +9,7 @@ import java.io.BufferedWriter;
 import java.io.File;
 import java.io.FileOutputStream;
 import java.io.OutputStreamWriter;
-/*
+
 import java.util.ArrayList;
 import java.util.List;
 import java.util.concurrent.Callable;
@@ -17,7 +17,7 @@ import java.util.concurrent.ExecutionException;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 import java.util.concurrent.Future;
-*/
+
 
 import java.io.IOException;
 import java.io.InputStream;
@@ -160,7 +160,6 @@ public class XbrlFileBusiness {
 	}
 	
 	private StringBuilder printFact(StringBuilder json, Fact fact, Instance instance) {
-		
 		json.append("    { \n"); //open fact
 		if (fact.getId() != null && !fact.getId().isEmpty())
 			json.append("      \"id\":\""+fact.getId()+"\", \n");
@@ -226,18 +225,23 @@ public class XbrlFileBusiness {
 				json.append("      } \n");
 			}
 		}
-		json.append("\n    }"); //close fact
+		json.append("\n    },\n"); //close fact
 		return json;
 	}
 	
-	/*
+	/**
+	 * print all facts from XBRL instance file
+	 * 
+	 * @param json
+	 * @param instance
+	 */
 	private void printFacts(StringBuilder json, Instance instance){
 		if (instance.getFactList() != null) {
 			xfile.setFactNumber(instance.getFactList().size());
 			
 			json.append("	\"fact\": [\n");
 			
-	    	ExecutorService executor = Executors.newFixedThreadPool(5);
+	    	ExecutorService executor = Executors.newFixedThreadPool(2);
 	    	List<Callable<Boolean>> callables = new ArrayList<>();
 
 			Queue<Fact> qfact = new ConcurrentLinkedQueue<>(
@@ -271,7 +275,7 @@ public class XbrlFileBusiness {
 			
 			executor.shutdown();
 			try {
-				Thread.sleep(500);
+				Thread.sleep(250);
 			} catch (InterruptedException e) {
 				e.printStackTrace();
 			}
@@ -280,7 +284,7 @@ public class XbrlFileBusiness {
 			json.append("]\n");
 		}
 	}
-	*/
+	
 	
 	/**
 	 * print in result string all prefixes from XBRL-XML document
@@ -288,7 +292,6 @@ public class XbrlFileBusiness {
 	 * @param json
 	 * @param instance
 	 */
-	/*
 	private void printPrefixes(StringBuilder json, Instance instance) {
 		if (instance.getPrefixList() != null) {
 			xfile.setPrefixNumber(instance.getPrefixList().size());
@@ -315,7 +318,7 @@ public class XbrlFileBusiness {
 			json.append("  }, \n");
 		}
 	}
-	*/
+	
 	
 	/**
 	 * print in result string all dts from XBRL-XML document
@@ -323,7 +326,6 @@ public class XbrlFileBusiness {
 	 * @param json
 	 * @param instance
 	 */
-	/*
 	private void printDtses(StringBuilder json, Instance instance) {
 		if (instance.getDtsList() != null) {
 			xfile.setDtsNumber(instance.getDtsList().size());
@@ -335,7 +337,7 @@ public class XbrlFileBusiness {
 			json.append("  }, \n");
 		}
 	}
-	*/
+	
 	
 	/**
 	 * parse Instance object (previouly loaded from XBRL-XML file) to string
@@ -343,7 +345,7 @@ public class XbrlFileBusiness {
 	 * @param instance
 	 * @return
 	 */
-	/*
+	
 	public String parseToJson(Instance instance) {
 		// report
 		StringBuilder json = new StringBuilder("{\n"); //root
@@ -367,113 +369,6 @@ public class XbrlFileBusiness {
 		new Thread(saveData).start();
 		
 		return json.toString().trim();
-	}
-	*/
-	
-	/**
-	 * get all prefixes in json format
-	 * 
-	 * @param instance
-	 * @return
-	 */
-	public String getJustPrefixes(Instance instance) {
-		StringBuilder json = new StringBuilder("{\n");
-		if (instance.getPrefixList() != null) {
-			
-			xfile.setPrefixNumber(instance.getPrefixList().size());
-			Optional<Prefix> optXbrliPrefix = instance.getPrefixList().stream()
-					.filter(p -> p.getName().equals("xbrli"))
-					.findFirst();
-			if (!optXbrliPrefix.isPresent()) {
-				instance.getPrefixList().add(new Prefix("xbrli", "http://www.xbrl.org/2003/instance"));
-			}
-			
-			Optional<Prefix> optXbrlPrefix = instance.getPrefixList().stream()
-					.filter(p -> p.getName().equals("xbrl"))
-					.findFirst();
-			if (optXbrlPrefix.isPresent()) {
-				instance.getPrefixList().remove(optXbrlPrefix.get());
-			}
-			
-			instance.getPrefixList().add(new Prefix("xbrl","http://www.xbrl.org/CR/2017-05-02/oim"));
-			//json.append("  \"prefix\" : { \n");
-			String comma = "";
-			for (Prefix prefix: instance.getPrefixList()) {
-				json.append(comma);
-				comma = ", \n";
-				json.append("      \""+prefix.getName()+"\":\""+prefix.getValue()+"\"");
-				
-			}
-		}
-		if (json != null && json.length() != 0) {
-			json.append("\n    }\n");
-			if (json != null && isJSONValid(json.toString())) {
-				return json.toString();
-			}
-		}
-		return null;
-	}
-	
-	/**
-	 * get the dts data
-	 * 
-	 * @param instance
-	 * @return
-	 */
-	public String getJustDts(Instance instance) {
-		StringBuilder json = new StringBuilder("{\n");
-		if (instance != null && instance.getDtsList() != null) {
-			xfile.setDtsNumber(instance.getDtsList().size());
-			String comma = "";
-			for (Dts dts: instance.getDtsList()) {
-				json.append(comma);
-				comma = ", \n";
-				json.append("    \""+dts.getName()+"\":\""+dts.getHref()+"\"");
-			}
-		}
-		if (json != null && json.length() != 0) {
-			json.append("\n    }\n");
-			if (isJSONValid(json.toString())) {
-				return json.toString();
-			}
-		}
-		return null;
-	}
-	
-	/**
-	 * get the facts data
-	 * 
-	 * @param instance
-	 * @return
-	 */
-	public String getJustFacts(Instance instance) {
-		StringBuilder json = new StringBuilder(" [\n")  ;
-		if (instance.getFactList() != null) {
-			
-			xfile.setFactNumber(instance.getFactList().size());
-			//json.append("	\"fact\": [\n");
-
-			Queue<Fact> qfact = new ConcurrentLinkedQueue<>(
-					Collections.unmodifiableList(instance.getFactList())
-					);
-			String comma = "";
-			while (qfact.peek() != null) {
-				Fact fact = qfact.poll();
-				json.append(comma);
-				comma = ",\n";
-				this.printFact(json, fact, instance);
-			}			
-		}
-		
-		if (json != null && json.length() != 0) {
-			json.append("\n  ]\n");
-			
-			if (json != null && isJSONValid(json.toString())) {
-				return json.toString();
-			}
-		}
-
-		return null;
 	}
 
 	
@@ -521,13 +416,10 @@ public class XbrlFileBusiness {
 	private boolean isJSONValid(String test) {
 		if (test != null) {
 		    try {
-		    	System.out.print("is json valid?");
 		        new JSONObject(test);
-		        System.out.println("[object] yes!");
 		    } catch (JSONException ex) {
 		        try {
 		            new JSONArray(test);
-		            System.out.println("[array] yes!");
 		        } catch (JSONException ex1) {
 		        	ex1.printStackTrace();
 		            return false;
@@ -538,4 +430,152 @@ public class XbrlFileBusiness {
 		return false;
 	}
 	
+	// new possibilities
+	
+	/**
+	 * get all prefixes in json format
+	 * 
+	 * @param instance
+	 * @return
+	 */
+	public String getJustPrefixes(Instance instance) {
+		StringBuilder json = new StringBuilder("{\n");
+		if (instance.getPrefixList() != null) {
+			
+			xfile.setPrefixNumber(instance.getPrefixList().size());
+			Optional<Prefix> optXbrliPrefix = instance.getPrefixList().stream()
+					.filter(p -> p.getName().equals("xbrli"))
+					.findFirst();
+			if (!optXbrliPrefix.isPresent()) {
+				instance.getPrefixList().add(new Prefix("xbrli", "http://www.xbrl.org/2003/instance"));
+			}
+			Optional<Prefix> optXbrlPrefix = instance.getPrefixList().stream()
+					.filter(p -> p.getName().equals("xbrl"))
+					.findFirst();
+			if (optXbrlPrefix.isPresent()) {
+				instance.getPrefixList().remove(optXbrlPrefix.get());
+			}
+			
+			instance.getPrefixList().add(new Prefix("xbrl","http://www.xbrl.org/CR/2017-05-02/oim"));
+			
+			//json.append("  \"prefix\" : { \n");
+			String comma = "";
+			
+			for (Prefix prefix: instance.getPrefixList()) {
+				json.append(comma);
+				comma = ",\n";
+				json.append("      \""+prefix.getName()+"\":\""+prefix.getValue()+"\"");
+				
+			}
+		}
+		if (json != null && json.length() != 0) {
+			json.append("}\n");
+			if (json != null && isJSONValid(json.toString())) {
+				return json.toString();
+			}
+		}
+		return null;
+	}
+	
+	/**
+	 * get the dts data
+	 * 
+	 * @param instance
+	 * @return
+	 */
+	public String getJustDts(Instance instance) {
+		StringBuilder json = new StringBuilder("{\n\n");
+		if (instance != null && instance.getDtsList() != null) {
+			xfile.setDtsNumber(instance.getDtsList().size());
+			String comma = "";
+			for (Dts dts: instance.getDtsList()) {
+				json.append(comma);
+				comma = ",\n		";
+				json.append("\""+dts.getName()+"\":\""+dts.getHref()+"\"");
+			}
+		}
+		if (json != null && json.length() != 0) {
+			json.append("\n    }\n");
+			if (isJSONValid(json.toString())) {
+				return json.toString();
+			}
+		}
+		return null;
+	}
+	
+	/**
+	 * get the facts data
+	 * 
+	 * @param instance
+	 * @return
+	 */
+	public String getJustFacts(Instance instance) {
+		StringBuilder json = new StringBuilder(" [\n")  ;
+		if (instance.getFactList() != null) {
+			
+			xfile.setFactNumber(instance.getFactList().size());
+			//json.append("	\"fact\": [\n");
+
+			Queue<Fact> qfact = new ConcurrentLinkedQueue<>(
+					Collections.unmodifiableList(instance.getFactList())
+					);
+			String comma = "";
+			while (qfact.peek() != null) {
+				Fact fact = qfact.poll();
+				json.append(comma);
+				comma = ",\n";
+				this.printFact(json, fact, instance);
+			}			
+		}
+		
+		if (json != null && json.length() != 0) {
+			json.append("\n  ]\n");
+			
+			if (json != null && isJSONValid(json.toString())) {
+				System.out.println("facts valid json");
+				return json.toString();
+			}
+		}
+
+		return null;
+	}	
+	
+	public void printPreloadFacts(StringBuilder json, Instance instance) {
+		if (instance.getFactList() != null) {
+			xfile.setFactNumber(instance.getFactList().size());
+			json.append("  \"fact\": [\n");
+			json.append("      { \"msg\" : \"wait a moment, still loading "+xfile.getFactNumber()+" facts...\" }");
+			json.append("  ]\n");
+		}
+	}
+	
+	public String getPreload(Instance instance) {
+		// report
+		StringBuilder json = new StringBuilder("{\n"); // root
+		json.append("  \"report\" : {\n"); // start of report
+		if (instance != null) {
+			try {
+				json.append("    \"documentType\":\"" + instance.getDocumentType() + "\", \n");
+				printPrefixes(json, instance);
+				printDtses(json, instance);
+				printPreloadFacts(json, instance);
+			} catch (Exception e) {
+				e.printStackTrace();
+			}
+		}
+		json.append("  } \n"); // end of report
+		json.append("} \n"); // root
+
+		/*
+		final String data = json.toString();
+		Runnable saveData = () -> {
+			this.saveStringInFile(data);
+		};
+		new Thread(saveData).start();
+		*/
+		if (json != null && isJSONValid(json.toString())) {
+			return json.toString();
+		}
+		return null;
+	}
 }
