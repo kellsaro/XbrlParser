@@ -237,7 +237,7 @@ public class XbrlFileBusiness {
 				json.append("      } \n");
 			}
 		}
-		json.append("\n    }\n"); //close fact
+		json.append("\n    },\n"); //close fact
 		return json;
 	}
 	
