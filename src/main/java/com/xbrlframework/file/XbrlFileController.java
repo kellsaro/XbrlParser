@@ -148,7 +148,7 @@ public class XbrlFileController {
 	
 	
 	
-	@PostMapping(value="/preload-url")
+	@PostMapping(value="/preload-uri")
 	public String getPreLoad(@RequestBody String uri) {
 		long milli1 = System.currentTimeMillis();
 		System.out.println("#### xbrlapi ####: [url: "+uri+"]");

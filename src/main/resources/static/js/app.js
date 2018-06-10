@@ -84,21 +84,44 @@ app.controller('xbrlController', ['$http','$scope', 'Upload', '$timeout', functi
     		if ($scope.user_url.includes(".xml") || $scope.user_url.includes(".xbrl")){
     			   			
     			var temp = $scope.user_url.split("/");
-    			$scope.name = temp[temp.length-1];
-	    		
+    			$scope.filename = temp[temp.length-1];
+				
+				//preload
+	    		$http({
+					method:'POST', 
+					url: $scope.host+'/preload-uri',
+					data: $scope.user_url
+				})
+				.then(function success(response){
+					console.log(response.data);
+					$scope.f = JSON.stringify(response.data, undefined, 4);
+					$scope.msg = response.data.report.fact[0].msg;
+					$timeout(function () {console.log(response.status);});
+				},function unsuccess(response){
+					console.log("response is a error: "+response);
+					$scope.f = '{\n "report" : {\n   \n } \n}' ;
+					$scope.msg = "something went wrong on server."
+				});
+
+				
+				//upload
 	    		$http({
 					method:'POST', 
 					url: $scope.host+'/upload-uri',
 					data: $scope.user_url
 				})
 				.then(function success(response){
-					$scope.clientes = response.data;
+					console.log(response.data);
 					$scope.f = JSON.stringify(response.data, undefined, 4);
+					$scope.msg = "finished."
+					$timeout(function () {console.log(response.status);});
 				},function unsuccess(response){
-					console.log(response);
-					$scope.f = '{\n "msg": "sorry! there was some error in server" \n}';
+					console.log("response is a error: "+response);
+					$scope.f = '{\n "report" : {\n   \n } \n}' ;
+					$scope.msg = "something went wrong on server."
 				});
-	    	
+				
+
     		}else{
 	    		$scope.f = '{\n "msg": "This URL must contain a XML or XBRL file", '+
 	    				'\n  "example": "https://www.sec.gov/Archives/edgar/data/1169567/000116956714000019/oxfo-20140930.xml" \n}';
