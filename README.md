@@ -1,6 +1,6 @@
 # XbrlParser: from XML to Json
 
-A Java RESTful api that converts XBRL-based financial documents from XML to Json format.
+Back-End is a Java REST API that converts XBRL-based financial documents from XML to Json format. Front-End is a Angular app.
 
 How to convert a xBRL-XML report to xBRL-JSON (via file): https://youtu.be/Xr6v4jL535w;
 
