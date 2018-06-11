@@ -1,3 +1,9 @@
+/*
+ * created by github.com/marcioAlexandre
+ * Jun01, 2018
+ * 
+ */
+
 var app = angular.module("app", ['ngFileUpload']);
 
 app.controller('xbrlController', ['$http','$scope', 'Upload', '$timeout', function ($http, $scope, Upload, $timeout) {

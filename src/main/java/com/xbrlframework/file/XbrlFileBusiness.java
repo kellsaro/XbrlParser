@@ -1,15 +1,18 @@
 /*
- * created by Marcio Alexandre
+ * created by github.com/marcioAlexandre
+ * Jun01, 2018
+ * 
  */
  
 package com.xbrlframework.file;
 
 
+/*
 import java.io.BufferedWriter;
 import java.io.File;
 import java.io.FileOutputStream;
 import java.io.OutputStreamWriter;
-/*
+
 import java.util.ArrayList;
 import java.util.List;
 import java.util.concurrent.Callable;
