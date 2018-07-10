@@ -9,7 +9,8 @@ var app = angular.module("app", ['ngFileUpload']);
 app.controller('xbrlController', ['$http','$scope', 'Upload', '$timeout', function ($http, $scope, Upload, $timeout) {
 	
 	$scope.init = function(){
-		$scope.host = 'https://xbrlframework.herokuapp.com';
+		//$scope.host = 'https://xbrlframework.herokuapp.com';
+		$scope.host = 'http://localhost';
 		$scope.user_url = '';
 		$scope.loadStatus = '	';
 		$scope.msg = 'select a file or type a valid URL';
@@ -28,9 +29,10 @@ app.controller('xbrlController', ['$http','$scope', 'Upload', '$timeout', functi
 
 	        if (file.name.includes(".xml") || file.name.includes(".xbrl") ) {
 	        	
-	        	if (file.name.includes("cal") || file.name.includes("lab") || file.name.includes("pre") || file.name.includes("ref") {
-		        	console.log("file must be a XBRL instance");
-		        	$scope.f = '{\n "msg": "xbrl-json-CR-2017-05-02 has just specified XBRL instances in Json format. For this reason, files from taxonomy (such as Label, Presentation, Calculation, Reference, Formula, etc) cannot be converted by this tool." \n}';
+	        	if (file.name.includes("cal") || file.name.includes("lab") || file.name.includes("pre") || file.name.includes("ref") || file.name.includes("def")) {
+
+	        		$scope.f = '{\n "msg": "xbrl-json-CR-2017-05-02 has just specified XBRL instances in Json format. For this reason, this tool just convert XBRL instances." \n}';
+	        		
 	        	}else{
 	        	
 		        	if (file.size <= 15000000) {
@@ -96,45 +98,55 @@ app.controller('xbrlController', ['$http','$scope', 'Upload', '$timeout', functi
     	if ($scope.user_url.includes("http://") || $scope.user_url.includes("https://")){
 	    
     		if ($scope.user_url.includes(".xml") || $scope.user_url.includes(".xbrl")){
-    			   			
+    			
     			var temp = $scope.user_url.split("/");
     			$scope.filename = temp[temp.length-1];
-				
-				//preload
-	    		$http({
-					method:'POST', 
-					url: $scope.host+'/preload-uri',
-					data: $scope.user_url
-				})
-				.then(function success(response){
-					console.log(response.data);
-					$scope.f = JSON.stringify(response.data, undefined, 4);
-					$scope.msg = response.data.report.fact[0].msg;
-					$timeout(function () {console.log(response.status);});
-				},function unsuccess(response){
-					console.log("response is a error: "+response);
-					$scope.f = '{\n "report" : {\n   \n } \n}' ;
-					$scope.msg = "something went wrong on server."
-				});
+    			
+    			if (file.name.includes("cal") || file.name.includes("lab") || file.name.includes("pre") || file.name.includes("ref") || file.name.includes("def")) {
 
+		        	$scope.f = '{\n "msg": "xbrl-json-CR-2017-05-02 has just specified XBRL instances in Json format. For this reason, this tool just convert XBRL instances." \n}';
+		        	
+	        	}else{
+    			   			
+	    			
+					
+					//preload
+		    		$http({
+						method:'POST', 
+						url: $scope.host+'/preload-uri',
+						data: $scope.user_url
+					})
+					.then(function success(response){
+						console.log(response.data);
+						$scope.f = JSON.stringify(response.data, undefined, 4);
+						$scope.msg = response.data.report.fact[0].msg;
+						$timeout(function () {console.log(response.status);});
+					},function unsuccess(response){
+						console.log("response is a error: "+response);
+						$scope.f = '{\n "report" : {\n   \n } \n}' ;
+						$scope.msg = "something went wrong on server."
+					});
+	
+					
+					//upload
+		    		$http({
+						method:'POST', 
+						url: $scope.host+'/upload-uri',
+						data: $scope.user_url
+					})
+					.then(function success(response){
+						console.log(response.data);
+						$scope.f = JSON.stringify(response.data, undefined, 4);
+						$scope.msg = "finished."
+						$timeout(function () {console.log(response.status);});
+					},function unsuccess(response){
+						console.log("response is a error: "+response);
+						$scope.f = '{\n "report" : {\n   \n } \n}' ;
+						$scope.msg = "something went wrong on server."
+					});
 				
-				//upload
-	    		$http({
-					method:'POST', 
-					url: $scope.host+'/upload-uri',
-					data: $scope.user_url
-				})
-				.then(function success(response){
-					console.log(response.data);
-					$scope.f = JSON.stringify(response.data, undefined, 4);
-					$scope.msg = "finished."
-					$timeout(function () {console.log(response.status);});
-				},function unsuccess(response){
-					console.log("response is a error: "+response);
-					$scope.f = '{\n "report" : {\n   \n } \n}' ;
-					$scope.msg = "something went wrong on server."
-				});
-				
+	    		
+	        	}
 
     		}else{
 	    		$scope.f = '{\n "msg": "This URL must contain a XML or XBRL file", '+
