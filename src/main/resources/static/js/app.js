@@ -27,52 +27,60 @@ app.controller('xbrlController', ['$http','$scope', 'Upload', '$timeout', functi
 			$scope.filename = file.name;
 
 	        if (file.name.includes(".xml") || file.name.includes(".xbrl") ) {
-	        	if (file.size <= 15000000) {
-	        		        		
-	        		var file = file;
-	        		        		
-	        		//preload
-	        		file.upload = Upload.upload({
-		                url: $scope.host+'/preload-file',
-		                data: {file: file}
-		            });      
-	 	            
-	        		file.upload.then(
-		            	function success (response) {
-		            		console.log(response.data);
-							$scope.f = JSON.stringify(response.data, undefined, 4);
-							$scope.msg = response.data.report.fact[0].msg;
-		            		$timeout(function () {console.log(response.status);});
-		            	}, 
-		            	function unsuccess (response) {
-		            		console.log("response is a error: "+response);
-	            			$scope.f = '{ "there were problems in loading this file" }' ;
-						});
-						
-					
-	        		//upload
-	        		file.upload = Upload.upload({
-		                url: $scope.host+'/upload-file',
-		                data: {file: file}
-		            });      
-	 	            
-	        		file.upload.then(
-		            	function success (response) {
-		            		console.log(response.data);
-							$scope.f = JSON.stringify(response.data, undefined, 4);
-							$scope.msg = "finished."
-		            		$timeout(function () {console.log(response.status);});
-		            	}, 
-		            	function unsuccess (response) {
-		            		console.log("response is a error: "+response);
-							$scope.f = '{\n "report" : {\n   \n } \n}' ;
-							$scope.msg = "something went wrong on server."
-	            		});						
-					
-	 	          
+	        	
+	        	if (file.name.includes("cal") || file.name.includes("lab") || file.name.includes("pre") || file.name.includes("ref") {
+		        	console.log("file must be a XBRL instance");
+		        	$scope.f = '{\n "msg": "xbrl-json-CR-2017-05-02 has just specified XBRL instances in Json format. For this reason, files from taxonomy (such as Label, Presentation, Calculation, Reference, Formula, etc) cannot be converted by this tool." \n}';
 	        	}else{
-	        		console.log("For while, max size per file is 15mb.");
-	    			$scope.f = '{\n  "msg": "Sorry! For while, max size per file is 15mb" \n}';
+	        	
+		        	if (file.size <= 15000000) {
+		        		        		
+		        		var file = file;
+		        		        		
+		        		//preload
+		        		file.upload = Upload.upload({
+			                url: $scope.host+'/preload-file',
+			                data: {file: file}
+			            });      
+		 	            
+		        		file.upload.then(
+			            	function success (response) {
+			            		console.log(response.data);
+								$scope.f = JSON.stringify(response.data, undefined, 4);
+								$scope.msg = response.data.report.fact[0].msg;
+			            		$timeout(function () {console.log(response.status);});
+			            	}, 
+			            	function unsuccess (response) {
+			            		console.log("response is a error: "+response);
+		            			$scope.f = '{ "there were problems in loading this file" }' ;
+							});
+							
+						
+		        		//upload
+		        		file.upload = Upload.upload({
+			                url: $scope.host+'/upload-file',
+			                data: {file: file}
+			            });      
+		 	            
+		        		file.upload.then(
+			            	function success (response) {
+			            		console.log(response.data);
+								$scope.f = JSON.stringify(response.data, undefined, 4);
+								$scope.msg = "finished."
+			            		$timeout(function () {console.log(response.status);});
+			            	}, 
+			            	function unsuccess (response) {
+			            		console.log("response is a error: "+response);
+								$scope.f = '{\n "report" : {\n   \n } \n}' ;
+								$scope.msg = "something went wrong on server."
+		            		});						
+						
+		 	          
+		        	}else{
+		        		console.log("For while, max size per file is 15mb.");
+		    			$scope.f = '{\n  "msg": "Sorry! For while, max size per file is 15mb" \n}';
+		        	}
+		        	
 	        	}
 	        }else{ // if is not xml or xbrl file
 	        	console.log("file must be in XML or XBRL format");
