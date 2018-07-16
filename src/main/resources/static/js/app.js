@@ -10,7 +10,7 @@ app.controller('xbrlController', ['$http','$scope', 'Upload', '$timeout', functi
 	
 	$scope.init = function(){
 		$scope.host = 'https://xbrlframework.herokuapp.com';
-		//$scope.host = 'http://localhost';
+		//$scope.host = 'http://localhost:8080';
 		$scope.user_url = '';
 		$scope.loadStatus = '	';
 		$scope.msg = 'select a file or type a valid URL';
@@ -102,7 +102,7 @@ app.controller('xbrlController', ['$http','$scope', 'Upload', '$timeout', functi
     			var temp = $scope.user_url.split("/");
     			$scope.filename = temp[temp.length-1];
     			
-    			if (file.name.includes("cal") || file.name.includes("lab") || file.name.includes("pre") || file.name.includes("ref") || file.name.includes("def")) {
+    			if ($scope.filename.includes("cal") || $scope.filename.includes("lab") || $scope.filename.includes("pre") || $scope.filename.includes("ref") || $scope.filename.includes("def")) {
 
 		        	$scope.f = '{\n "msg": "xbrl-json-CR-2017-05-02 has just specified XBRL instances in Json format. For this reason, this tool just convert XBRL instances." \n}';
 		        	
