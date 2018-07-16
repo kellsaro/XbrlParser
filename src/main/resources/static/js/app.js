@@ -31,7 +31,7 @@ app.controller('xbrlController', ['$http','$scope', 'Upload', '$timeout', functi
 	        	
 	        	if (file.name.includes("cal") || file.name.includes("lab") || file.name.includes("pre") || file.name.includes("ref") || file.name.includes("def")) {
 
-	        		$scope.f = '{\n "msg": "xbrl-json-CR-2017-05-02 has just specified XBRL instances in Json format. For this reason, this tool just convert XBRL instances." \n}';
+	        		$scope.f = '{\n "msg": "xbrl-json-CR-2017-05-02 has just specified XBRL instances in Json format. For this reason, this tool just converts XBRL instances." \n}';
 	        		
 	        	}else{
 	        	
@@ -104,7 +104,7 @@ app.controller('xbrlController', ['$http','$scope', 'Upload', '$timeout', functi
     			
     			if ($scope.filename.includes("cal") || $scope.filename.includes("lab") || $scope.filename.includes("pre") || $scope.filename.includes("ref") || $scope.filename.includes("def")) {
 
-		        	$scope.f = '{\n "msg": "xbrl-json-CR-2017-05-02 has just specified XBRL instances in Json format. For this reason, this tool just convert XBRL instances." \n}';
+		        	$scope.f = '{\n "msg": "xbrl-json-CR-2017-05-02 has just specified XBRL instances in Json format. For this reason, this tool just converts XBRL instances." \n}';
 		        	
 	        	}else{
     			   			
