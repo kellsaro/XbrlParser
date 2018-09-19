@@ -10,7 +10,6 @@ app.controller('xbrlController', ['$http','$scope', 'Upload', '$timeout', functi
 	
 	$scope.init = function(){
 		$scope.host = 'https://xbrlframework.herokuapp.com';
-		//$scope.host = 'http://localhost:8080';
 		$scope.user_url = '';
 		$scope.loadStatus = '	';
 		$scope.msg = 'select a file or type a valid URL';
@@ -73,7 +72,7 @@ app.controller('xbrlController', ['$http','$scope', 'Upload', '$timeout', functi
 			            	}, 
 			            	function unsuccess (response) {
 			            		console.log("response is a error: "+response);
-								$scope.f = '{\n "report" : {\n   \n } \n}' ;
+								$scope.f = '{\n "msg" : "error from server" \n}' ;
 								$scope.msg = "something went wrong on server."
 		            		});						
 						
