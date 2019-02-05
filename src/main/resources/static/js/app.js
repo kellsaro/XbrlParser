@@ -38,7 +38,8 @@ app.controller('xbrlController', ['$http','$scope', 'Upload', '$timeout', functi
 		        	if (file.size <= 15000000) {
 		        		        		
 		        		var file = file;
-		        		        		
+		        		        	
+		        		$scope.msg = 'your file is loading...';
 		        		//preload
 		        		file.upload = Upload.upload({
 			                url: $scope.host+'/preload-file',
@@ -68,7 +69,7 @@ app.controller('xbrlController', ['$http','$scope', 'Upload', '$timeout', functi
 			            	function success (response) {
 			            		console.log(response.data);
 								$scope.f = JSON.stringify(response.data, undefined, 4);
-								$scope.msg = "finished."
+								$scope.msg = "Finished! Your XBRL-Json data is ready."
 			            		$timeout(function () {console.log(response.status);});
 			            	}, 
 			            	function unsuccess (response) {
