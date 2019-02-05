@@ -368,6 +368,7 @@ public class InstanceBusiness {
     public void putUnits() {
     	instance.setUnitMap(this.getUnits());
     }
+      
     
     /**
      * get all fact from XBRL-XML file
@@ -378,45 +379,16 @@ public class InstanceBusiness {
     	List<Fact> facts = new ArrayList<>();
     	//Thread thread = null;
     	NodeList nodes = this.getNodeChildrenFrom(this.getRootNode());
-    	
-    	ExecutorService executor = Executors.newFixedThreadPool(5);
-    	List<Callable<Boolean>> callables = new ArrayList<>();
-
     	for (int i = 0; i < nodes.getLength(); i++) {
 			Node node = nodes.item(i);
-			Callable<Boolean> task = () -> {
-				synchronized (this){
-					if (this.isFact(node)) {
-						Fact fact = this.getFact(node);
-						facts.add(fact);
-					}
-					return true;
-				}
-			};
-			executor.submit(task);
-			callables.add(task);
-		}
-
-		try {
-			List<Future<Boolean>> futures = executor.invokeAll(callables);
-			for (Future<Boolean> f: futures) {
-				if (!f.isDone()) {
-					try {
-						f.get();
-					} catch (ExecutionException e) {
-						e.printStackTrace();
-					}
-				}
+			if (this.isFact(node)) {
+				Fact fact = this.getFact(node);
+				facts.add(fact);
 			}
-		} catch (InterruptedException e) {
-			e.printStackTrace();
 		}
-		
-		executor.shutdown();
-		
 		return facts;
-    }
-
+    }    
+    
     /**
      * build a Fact object from facts contained in XBRL-XML file
      * 

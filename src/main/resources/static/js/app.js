@@ -10,6 +10,7 @@ app.controller('xbrlController', ['$http','$scope', 'Upload', '$timeout', functi
 	
 	$scope.init = function(){
 		$scope.host = 'https://xbrlframework.herokuapp.com';
+		//$scope.host = 'http://localhost:8080';
 		$scope.user_url = '';
 		$scope.loadStatus = '	';
 		$scope.msg = 'select a file or type a valid URL';
