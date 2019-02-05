@@ -23,7 +23,9 @@ app.controller('xbrlController', ['$http','$scope', 'Upload', '$timeout', functi
 	
 	$scope.uploadFiles = function(file) {
     	
-    	if (file != null){
+		$scope.msg = 'your file is loading...';
+		
+    	if (file != null){		
 							   
 			$scope.filename = file.name;
 
@@ -39,7 +41,7 @@ app.controller('xbrlController', ['$http','$scope', 'Upload', '$timeout', functi
 		        		        		
 		        		var file = file;
 		        		        	
-		        		$scope.msg = 'your file is loading...';
+		        		
 		        		//preload
 		        		file.upload = Upload.upload({
 			                url: $scope.host+'/preload-file',
