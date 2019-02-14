@@ -22,12 +22,10 @@ import org.junit.Test;
 import org.w3c.dom.Document;
 import org.xml.sax.SAXException;
 
-import com.xbrlframework.file.XbrlFileBusiness;
-import com.xbrlframework.instance.InstanceBusiness;
 import org.json.*;
 
 public class XbrlFileBusinessTest {
-
+/*
 	static DocumentBuilder documentBuilder;
 	static XbrlFileBusiness xfilebusiness;
 	static String notXbrlUri = "https://www.sec.gov/Archives/edgar/data/320193/000032019318000070/aapl-20180331.xsd";
@@ -126,6 +124,6 @@ public class XbrlFileBusinessTest {
 	public void setFileAs_MultipartFile() {
 
 
-	}
+	}*/
 	
 }

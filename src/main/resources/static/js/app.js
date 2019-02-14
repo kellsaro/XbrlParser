@@ -9,8 +9,8 @@ var app = angular.module("app", ['ngFileUpload']);
 app.controller('xbrlController', ['$http','$scope', 'Upload', '$timeout', function ($http, $scope, Upload, $timeout) {
 	
 	$scope.init = function(){
-		$scope.host = 'https://xbrlframework.herokuapp.com';
-		//$scope.host = 'http://localhost:8080';
+		//$scope.host = 'https://xbrlframework.herokuapp.com';
+		$scope.host = 'http://localhost:8080';
 		$scope.user_url = '';
 		$scope.loadStatus = '	';
 		$scope.msg = 'select a file or type a valid URL';
@@ -43,42 +43,44 @@ app.controller('xbrlController', ['$http','$scope', 'Upload', '$timeout', functi
 		        		
 		        		//preload
 		        		file.upload = Upload.upload({
-			                url: $scope.host+'/preload-file',
+			                url: $scope.host+'/rest/preload-file',
 			                data: {file: file}
-			            });
-		 	            
-		        		file.upload.then(
+			            })
+			            .then(
 			            	function success (response) {
 			            		console.log(response.data);
 								$scope.f = JSON.stringify(response.data, undefined, 4);
 								$scope.msg = response.data.report.fact[0].msg;
 			            		$timeout(function () {console.log(response.status);});
-			            	}, 
+			            	},
+			            	
 			            	function unsuccess (response) {
 			            		console.log("response is a error: "+response);
 		            			$scope.f = '{ "there were problems in loading this file" }' ;
-							});
+							}
+			            );
+		        		console.log("Call to: /rest/preload-file");
 							
-						
 		        		//upload
 		        		file.upload = Upload.upload({
-			                url: $scope.host+'/upload-file',
+			                url: $scope.host+'/rest/upload-file',
 			                data: {file: file}
-			            });      
-		 	            
-		        		file.upload.then(
+			            })      
+		 	            .then(
 			            	function success (response) {
 			            		console.log(response.data);
 								$scope.f = JSON.stringify(response.data, undefined, 4);
 								$scope.msg = "Finished! Your XBRL-Json data is ready."
 			            		$timeout(function () {console.log(response.status);});
 			            	}, 
+			            	
 			            	function unsuccess (response) {
 			            		console.log("response is a error: "+response);
 								$scope.f = '{\n "msg" : "error from server" \n}' ;
 								$scope.msg = "something went wrong on server."
-		            		});						
-						
+		            		}
+			            );						
+		        		console.log("Call to: /rest/upload-file");
 		 	          
 		        	}else{
 		        		console.log("For while, max size per file is 15mb.");
@@ -110,44 +112,48 @@ app.controller('xbrlController', ['$http','$scope', 'Upload', '$timeout', functi
 		        	
 	        	}else{
     			   			
-	    			
-					
 					//preload
 		    		$http({
 						method:'POST', 
-						url: $scope.host+'/preload-uri',
+						url: $scope.host+'/rest/preload-uri',
 						data: $scope.user_url
 					})
-					.then(function success(response){
-						console.log(response.data);
-						$scope.f = JSON.stringify(response.data, undefined, 4);
-						$scope.msg = response.data.report.fact[0].msg;
-						$timeout(function () {console.log(response.status);});
-					},function unsuccess(response){
-						console.log("response is a error: "+response);
-						$scope.f = '{\n "report" : {\n   \n } \n}' ;
-						$scope.msg = "something went wrong on server."
-					});
-	
+					.then(
+						function success(response){
+							console.log(response.data);
+							$scope.f = JSON.stringify(response.data, undefined, 4);
+							$scope.msg = response.data.report.fact[0].msg;
+							$timeout(function () {console.log(response.status);});
+						},
+						
+						function unsuccess(response){
+							console.log("response is a error: "+response);
+							$scope.f = '{\n "report" : {\n   \n } \n}' ;
+							$scope.msg = "something went wrong on server."
+						}
+					);
 					
 					//upload
 		    		$http({
 						method:'POST', 
-						url: $scope.host+'/upload-uri',
+						url: $scope.host+'/rest/upload-uri',
 						data: $scope.user_url
 					})
-					.then(function success(response){
-						console.log(response.data);
-						$scope.f = JSON.stringify(response.data, undefined, 4);
-						$scope.msg = "finished."
-						$timeout(function () {console.log(response.status);});
-					},function unsuccess(response){
-						console.log("response is a error: "+response);
-						$scope.f = '{\n "report" : {\n   \n } \n}' ;
-						$scope.msg = "something went wrong on server."
-					});
+					.then(
+						function success(response){
+							console.log(response.data);
+							$scope.f = JSON.stringify(response.data, undefined, 4);
+							$scope.msg = "finished."
+							$timeout(function () {console.log(response.status);});
+						},
+						
+						function unsuccess(response){
+							console.log("response is a error: "+response);
+							$scope.f = '{\n "report" : {\n   \n } \n}' ;
+							$scope.msg = "something went wrong on server."
+						}
+					);
 				
-	    		
 	        	}
 
     		}else{

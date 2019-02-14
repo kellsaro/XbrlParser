@@ -15,7 +15,9 @@ import org.springframework.boot.test.context.SpringBootTest;
 import org.w3c.dom.Document;
 import org.xml.sax.SAXException;
 
-import com.xbrlframework.file.XbrlFileBusiness;
+
+import io.xbrl.domain.service.InstanceBusiness;
+import io.xbrl.domain.service.XbrlFile;
 
 import static org.junit.Assert.*;
 
@@ -27,10 +29,10 @@ import javax.xml.parsers.ParserConfigurationException;
 
 @SpringBootTest
 public class InstanceBusinessTest {
-	
+	/*
 	static InstanceBusiness ib = new InstanceBusiness();
 	static DocumentBuilder documentBuilder;
-	static XbrlFileBusiness xfilebusiness = new XbrlFileBusiness();
+	static XbrlFile xfilebusiness = new XbrlFile();
 	static Document validFile;
 	static Document invalidFile;
 	
@@ -51,7 +53,7 @@ public class InstanceBusinessTest {
 	@Before
 	public void instacianting() throws ParserConfigurationException {
 		ib = new InstanceBusiness();
-		ib.setRootNodeFrom(xfilebusiness.getFileAsDocument());
+		ib.setRootNodeFrom(xfilebusiness.getDocument());
 	}
 	
 	@Test
@@ -295,5 +297,5 @@ public class InstanceBusinessTest {
 		documentBuilder = null;
 		validFile = null;
 		invalidFile = null;
-	}
+	}*/
 }
