@@ -21,6 +21,8 @@ import org.w3c.dom.Document;
 import io.xbrl.domain.service.XbrlParser;
 import io.xbrl.domain.service.InstanceBusiness;
 
+import static io.xbrl.domain.service.XbrlParser.getPreload;
+
 @RestController
 @RequestMapping("/rest")
 public class XbrlFileResource {
@@ -56,9 +58,8 @@ public class XbrlFileResource {
 					
 					XbrlParser xbrlParser = null;
 					
-					try {
+					try(InputStream fileInputStream = file.getInputStream()) {
 						
-						InputStream fileInputStream = file.getInputStream();
 						DocumentBuilder documentBuilder = DocumentBuilderFactory.newInstance().newDocumentBuilder();
 					
 						Document doc = documentBuilder.parse(fileInputStream);
@@ -71,17 +72,16 @@ public class XbrlFileResource {
 						ib.putDtsList();
 						ib.putFacts();
 						
-						result = xbrlParser.getPreload(ib.getInstance());
+						result = getPreload(ib.getInstance());
 						
 						long milli2 = System.currentTimeMillis();
 						System.out.println(String.format("## xbrl-parser | preloadFile ##: [performance time: %s milliseconds]", (milli2-milli1)));
-						
-						return result;
-						
 					} 
 					catch (Exception e) {
 						e.printStackTrace();
 					}
+					
+					return result;
 				}
 				else {
 					
@@ -134,9 +134,8 @@ public class XbrlFileResource {
 					
 					XbrlParser xbrlParser = null;
 					
-					try {
+					try(InputStream fileInputStream = file.getInputStream()) {
 					
-						InputStream fileInputStream = file.getInputStream();
 						DocumentBuilder documentBuilder = DocumentBuilderFactory.newInstance().newDocumentBuilder();
 					
 						Document doc = documentBuilder.parse(fileInputStream);
@@ -147,12 +146,12 @@ public class XbrlFileResource {
 						
 						long milli2 = System.currentTimeMillis();
 						System.out.println(String.format("## xbrl-parser | uploadFile ##: [performance time: %s milliseconds]", (milli2-milli1)));
-						return result;
-						
 					} 
 					catch (Exception e) {
 						e.printStackTrace();
 					}
+					
+					return result;
 				}
 				else {
 					
