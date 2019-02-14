@@ -4,7 +4,7 @@ Web XBRL parser forked from https://github.com/marcioalexandre/XbrlParser.git
 Thanks Marcio Alexandre, great work!!
 
 I divide the XbrlParser in two modules: this web application and a
-library at https://github.com/kellsaro/xbrl-parser.git
+class library at https://github.com/kellsaro/xbrl-parser.git
 
 ## Notes from the original project
 
